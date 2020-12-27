@@ -1,8 +1,23 @@
 ﻿.h1 {
-    font-size: 40px;
+    font-size: 100px;
     font-weight: bold;
     font-family: "Microsoft Sans Serif", sans-serif;
 }
+a {
+    text-decoration: none;
+}
 .post-body {
-    font-size: 14px;
+    font-size: 17px;
+}
+.post-title {
+    line-height: 0px;
+    font-size: 19px;
+}
+.imformation {
+    line-height: 11px;
+    font-size: 10px;
+}
+#latest {
+    font-size: 30px;
+    line-height: 0px;
 }
