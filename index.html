@@ -2,10 +2,24 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="utf-8" />
-        <title>Hello!</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-        <p>This is the index page.</p>
+        <title>Posts</title>
+        <link rel="stylesheet" type="text/css" href="/apps/css/style.css" />
+        <div class="main">
+            <h1 class="h1">Posts</h1>
+            <div class="list">
+                <ul>
+                    <li><a href="#latest">Latest Posts</a></li>
+                    <li><a href="#all_posts">All Posts</a></li>
+                </ul>
+            </div>
+            <div id="latest">
+                <h4><a name="#latest">Latest Posts</a></h4>
+                <div class="post">
+                    <h6 class="post-title">Post Name</h6>
+                    <p>Created: <span class="date">Date</span><br />By: <span class="author">Author</span></p>
+                    <p class="post-body">Post Body</p>
+                </div>
+            </div>
+        </div>
     </body>
-    </html>
+</html>
