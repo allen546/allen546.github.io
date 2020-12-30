@@ -15,4 +15,8 @@ var redirect_to_khanacademy = function () {
 var redirect_to_codacademy = function () {
     var url = redirect("https://www.codecademy.com/learn/learn-html");
     return url;
-}
+};
+var redirect_to_index = function () {
+    var url = redirect("https://allen546.github.io/web/");
+    return url;
+};
