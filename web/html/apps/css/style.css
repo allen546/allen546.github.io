@@ -2,6 +2,16 @@
     text-decoration: none;
     color: blue;
 }
+p {
+    color: white;
+}
 .no-color {
     color: rgb(0, 0, 0);
+}
+body {
+    background-image: url("../images/background.jpg");
+    background-repeat: no-repeat;
+}
+small {
+    color:black;
 }
