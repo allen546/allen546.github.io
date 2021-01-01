@@ -20,7 +20,7 @@ var redirect_to_index = function () {
     var url = redirect("https://allen546.github.io/web/");
     return url;
 };
-var redirect_to_computerhope = function () {
+var redirect1 = function () {
     var url = redirect("https://www.computerhope.com/jargon/h/html.htm");
     return url;
 };
