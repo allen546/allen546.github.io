@@ -23,4 +23,4 @@ var redirect_to_index = function () {
 var redirect_to_computerhope = function () {
     var url = redirect("https://www.computerhope.com/jargon/h/html.htm");
     return url;
-}
+};
