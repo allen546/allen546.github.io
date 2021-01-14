@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <script type="text/javascript" src="apps/js/jquery.js"></script>
+        <!--<script type="text/javascript" src="apps/js/jquery.js"></script>-->
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>HTML: The Language of the web</title>
@@ -14,12 +14,11 @@
         <div class="jquery"></div>
         <div id="main">
             <div class="jumbotron">
-                <h1 class="title">
-                <center>
+                <h1 class="title centered">
                     <a href="https://developer.mozilla.org/en-US/docs/Web/HTML">
-                    <span class="no-color">HTML</span>
-                        </a>: The Language Of The Web
-                </center></h1>
+                        <span class="no-color">HTML</span>
+                    </a>: The Language Of The Web
+                </h1>
             </div>
             <div class="navbar">
                 <p><small>Jump To:</small></p>
@@ -29,10 +28,12 @@
                     <li><a href="#learn-html">Learn HTML</a></li>
                 </ol>
             </div>
+            <br />
             <div id="earth-internet-pic">
-                <img src="apps/images/pic1.png" height="390" width="665" alt="Picture of the Internet with an earth in it" />
-                <img src="apps/images/pic2.png" height="390" width="665" alt="Picture of monitor transferring bytes over the Internet" />
+                <img src="apps/images/pic1.png" height="380" width="660" alt="Picture of the Internet with an earth in it" />
+                <img src="apps/images/pic2.png" height="380" width="660" alt="Picture of monitor transferring bytes over the Internet" />
             </div>
+            <br />
             <div id="what-is">
                 <h3><a name="#what-is-html">What Is HTML?</a></h3>
                 <p>
@@ -51,8 +52,9 @@
                     provides a basic structure of the page, upon which Cascading Style Sheets are overlaid to change its <wbr />
                     appearance. One could think of HTML as the bones (structure) of a web page, and CSS as its skin (appearance).
                 </p>
-                <p><button onclick="redirect1()">See more at computerhope.com</button></p>
+                <p>See more at <button onclick="redirect1()">computerhope.com</button></p>
             </div>
+            <br />
             <div id="history">
                 <h3><a name="#history-of-html">The History Of HTML</a></h3>
                 <p>
@@ -65,13 +67,36 @@
                 </p>
                 <p class="reference"><small>See more at <button onclick="redirect_to_w3schools()">w3schools.in</button></small></p>
             </div>
+            <br />
             <div id="learn">
                 <h3><a name="#learn-html">Learn HTML</a></h3>
+                <p>
+                    To build a website, you need an HTML editor. Any text editor will work, but I suggest using 
+                    <a href="https://notepad-plus-plus.org/">Notepad++</a>, <wbr />
+                    <a href="https://www.sublimetext.com">Sublime Text</a> or 
+                    <a href="https://visualstudio.microsoft.com/vs">Visual Studio</a>. 
+                    Be sure to save it as an .htm or .html file!
+</p>
+                <div id="structure">
+                    <p>This is the structure for <i>any</i> site:</p>
+                    <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="en" xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;title>Page Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+[More HTML Code Here]
+&lt;/body&gt;
+&lt;/html&gt;
+                    </pre>
+                </div>
                 <p>
                     The best resources to learn HTML is probably <button onclick="redirect_to_codacademy()">codacademy.org</button> <wbr />
                     and <button onclick="redirect_to_khanacademy()">khanacademy.org</button>
                 </p>
             </div>
+            <br />
             <div id="index-redirect">
                 <p><button onclick="redirect_to_index()">Click here to go to index page</button></p>
             </div>

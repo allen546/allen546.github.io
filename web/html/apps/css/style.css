@@ -11,3 +11,14 @@ p {
 small {
     color:black;
 }
+.centered {
+    text-align: center;
+}
+pre {
+    font-size: 20px;
+    border: 2px solid #9ea3a7;
+    border-radius: 20px;
+    padding: 14px;
+    background-color: #9ea3a7;
+    color: black;
+}
