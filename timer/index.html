@@ -12,33 +12,59 @@
             var g = c.createGain()
             o.connect(g);
             g.connect(c.destination);
-            o.type = "square"
+            o.type = "square";
             o.start(0);
             o.frequency.value = freq;
             var notelength = notelength || 5;
             g.gain.exponentialRampToValueAtTime(0.00001, c.currentTime + notelength);
         }
         function startTiming() {
-            var time = document.getElementById("seconds").value;
-            if (time === "") {
-                document.getElementById("warning").innerHTML = "Warning: Field 'Seconds' Cannot be left empty.";
-                return;
+            var mins = document.getElementById("minutes").value;
+            var secs = document.getElementById("seconds").value;
+            if (mins === "") {
+                if (secs === "") {
+                    document.getElementById("warning").innerHTML = "Warning: Field 'Seconds' And Field 'Minutes' Cannot both be left empty.";
+                    return;
+                }
+                else {
+                    document.getElementById("warning").innerHTML = "";
+                };
             }
             else {
                 document.getElementById("warning").innerHTML = "";
+            };
+            var time = mins * 60 + parseInt(secs);
+            var timestring = "";
+            if (time > 60) {
+                timestring = Math.floor(time / 60) + " minutes and " + time % 60 + " seconds left";
             }
+            else {
+                timestring = time + " seconds left";
+            }
+            document.getElementById("timeleft").innerHTML = timestring;
+            document.getElementById("timeleft").innerHTML = timestring;
             document.getElementById("timer").disabled = true;
             $("#timer").css("background-color", "lightgrey");
             var round = setInterval(function () {
                 if (time > 0) {
                     time -= 1;
-                    document.getElementById("timeleft").innerHTML = time;
+                    if (time === 0) {
+                        document.getElementById("timer").disabled = false;
+                        $("#timer").css("background-color", "");
+                        playSound(600, 10);
+                    }
+                    var timestring = "";
+                    if (time > 60) {
+                        timestring = Math.floor(time / 60) + " minutes and " + time % 60 + " seconds left";
+                    }
+                    else {
+                        timestring = time + " seconds left";
+                    }
+                    document.getElementById("timeleft").innerHTML = timestring;
                 }
                 else {
-                    document.getElementById("timer").disabled = false;
-                    $("#timer").css("background-color", "");
                     clearInterval(round);
-                    playSound(600, 10);
+                    
                 };
             }, 1000);
         }
@@ -56,9 +82,12 @@
 </head>
 <body>
     <h1>Timer</h1>
+    <label>Minutes: </label><input type="number" id="minutes" />
+    <br />
     <label>Seconds: </label><input type="number" id="seconds" />
+    <br />
     <button id="timer" onclick="startTiming();">Start!</button>
-    <p><span id="timeleft">0</span> seconds left</p>
+    <p><span id="timeleft"></span></p>
     <p class="warning" id="warning"></p>
 </body>
 </html>
