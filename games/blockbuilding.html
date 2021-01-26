@@ -4,10 +4,31 @@
 <head>
     <meta charset="utf-8" />
     <script type="text/javascript" src="../apps/js/jquery.js"></script>
+    <script type="text/javascript" src="../apps/js/jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        var shapeCount = 0;
+        var colors = ["red", "green", "blue"];
+        function createShape() {
+            shapeCount += 1;
+
+            var size = Math.floor((Math.random() * 100) + 5);
+            var color = colors[Math.floor(Math.random() * colors.length)];
+            var shapeID = "shape" + shapeCount;
+            $("body").append("<div id='" + shapeID + "' class='block'></div>");
+            $("#" + shapeID).css("width", size + "px");
+            $("#" + shapeID).css("min-height", size + "px");
+            $("#" + shapeID).css("background-color", color);
+            $("#" + shapeID).draggable();
+            var circle = Math.floor(Math.random() * 10 + 1);
+            if (circle > 7) {
+                $("#" + shapeID).css("border-radius", "50px");
+            };
+        };
+    </script>
     <link rel="stylesheet" href="apps/css/style.css" type="text/css" />
     <title>Build, Build, Build!</title>
 </head>
 <body>
-
+    <button id="mainbutton" onclick="createShape();">Create Shape!</button>
 </body>
 </html>

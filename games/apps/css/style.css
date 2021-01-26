@@ -1,8 +1,18 @@
 ﻿body
 {
-    background-color: blue;
+    background-color: lightblue;
 }
 button {
     background-color: green;
     color: white;
+}
+.block{
+    float:right;
+    margin: 5px 5px 5px 5px;
+    display:inline-block;
+}
+#mainbutton{
+    width: 90px;
+    height: 35px;
+    border-radius:10px;
 }
