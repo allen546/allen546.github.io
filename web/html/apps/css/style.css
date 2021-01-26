@@ -29,5 +29,9 @@ code {
     background-color: #9ea3a7;
 }
 body {
-    background-color: rgb(12, 165, 243);
+    background-color: rgb(91, 194, 238);
+}
+button {
+    background-color: #7fff88;
+    border-radius: 7px;
 }
