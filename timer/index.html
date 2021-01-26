@@ -19,7 +19,7 @@
             g.gain.exponentialRampToValueAtTime(0.00001, c.currentTime + notelength);
         }
         function startTiming() {
-            var time = document.getElementById("seconds").value
+            var time = document.getElementById("seconds").value;
             if (time === "") {
                 document.getElementById("warning").innerHTML = "Warning: Field 'Seconds' Cannot be left empty.";
                 return;
