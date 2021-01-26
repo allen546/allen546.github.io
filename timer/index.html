@@ -33,7 +33,11 @@
             else {
                 document.getElementById("warning").innerHTML = "";
             };
-            var time = mins * 60 + parseInt(secs);
+            var seconds = parseInt(secs);
+            var time = mins * 60;
+            if (seconds === nan) {
+                time += seconds;
+            }
             var timestring = "";
             if (time > 60) {
                 timestring = Math.floor(time / 60) + " minutes and " + time % 60 + " seconds left";
