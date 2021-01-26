@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="../apps/css/style.css" />
+    <script src="../apps/js/jquery.js"></script>
+    <script>
+        function playSound(freq, notelength) {
+            var c = new AudioContext();
+            var o = c.createOscillator();
+            var g = c.createGain()
+            o.connect(g);
+            g.connect(c.destination);
+            o.type = "square"
+            o.start(0);
+            o.frequency.value = freq;
+            var notelength = notelength || 5;
+            g.gain.exponentialRampToValueAtTime(0.00001, c.currentTime + notelength);
+        }
+        function startTiming() {
+            var time = document.getElementById("seconds").value
+            if (time === "") {
+                document.getElementById("warning").innerHTML = "Warning: Field 'Seconds' Cannot be left empty.";
+                return;
+            }
+            else {
+                document.getElementById("warning").innerHTML = "";
+            }
+            document.getElementById("timer").disabled = true;
+            $("#timer").css("background-color", "lightgrey");
+            var round = setInterval(function () {
+                if (time > 0) {
+                    time -= 1;
+                    document.getElementById("timeleft").innerHTML = time;
+                }
+                else {
+                    document.getElementById("timer").disabled = false;
+                    $("#timer").css("background-color", "");
+                    clearInterval(round);
+                    playSound(600, 10);
+                };
+            }, 1000);
+        }
+    </script>
+    <style>
+        button {
+            width:100px;
+            height:30px;
+        }
+        .warning {
+            color: red;
+        }
+    </style>
+    <title>Timer</title>
+</head>
+<body>
+    <h1>Timer</h1>
+    <label>Seconds: </label><input type="number" id="seconds" />
+    <button id="timer" onclick="startTiming();">Start!</button>
+    <p><span id="timeleft">0</span> seconds left</p>
+    <p class="warning" id="warning"></p>
+</body>
+</html>
