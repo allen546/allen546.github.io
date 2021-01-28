@@ -8,7 +8,12 @@
     <script>
         function calculate() {
             var expr = document.getElementById("expr").value;
-            var output = eval(expr);
+            try {
+                var output = eval(expr);
+            }
+            catch (Error) {
+                var output = "Error: '" + expr + "' is not a valid expression."
+            };
             document.getElementById("output").innerHTML = output;
         }
 
