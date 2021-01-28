@@ -1,26 +1,35 @@
-﻿a[href] {
+﻿h1 {
+    font-size: 40px;
+}
+a[href] {
     text-decoration: none;
     color: blue;
 }
 p {
     color: #000000;
+    font-size: 18px;
+    font-family: Calibri, Arial, Helvetica,sans-serif;
+    font-display: auto;
+    font-weight: normal;
 }
 .no-color {
     color: rgb(0, 0, 0);
 }
 small {
     color:black;
+    font-size: 0.9em;
 }
 .centered {
     text-align: center;
 }
 pre {
-    font-size: 17px;
+    font-size: 18px;
     border: 2px solid #9ea3a7;
     border-radius: 20px;
     padding: 14px;
     background-color: #9ea3a7;
     color: black;
+    white-space: pre-wrap;
 }
 code {
     font-size: 15px;
