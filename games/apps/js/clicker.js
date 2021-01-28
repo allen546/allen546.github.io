@@ -42,27 +42,27 @@ var buy = function (objectid) {
     var coins = document.getElementById("coins").innerHTML;
     switch (objectid) {
         case 1:
-            if (coins < 50) {
+            if (coins < 30) {
                 document.getElementById("warning").innerHTML = "Error: Not Enough Coins.";
                 return;
             };
             secs = 5;
-            coins -= 50;
+            coins -= 30;
             break;
         case 2:
             if (coins < 50) {
                 document.getElementById("warning").innerHTML = "Error: Not Enough Coins.";
                 return;
             };
-            coins -= 70;
+            coins -= 50;
             secs = 3;
             break;
         case 3:
-            if (coins < 50) {
+            if (coins < 70) {
                 document.getElementById("warning").innerHTML = "Error: Not Enough Coins.";
                 return;
             };
-            coins -= 100;
+            coins -= 70;
             secs = 1;
             break;
     };
