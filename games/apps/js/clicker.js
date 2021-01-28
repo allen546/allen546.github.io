@@ -11,16 +11,12 @@ var clicked = function () {
         score++;
         meter.value = meter.value % blowpercent;
         blowpercent += 0.05;
-        if (blowpercent >= 0.5) {
+        if (blowpercent >= 0.3) {
             blowpercent = 0.1;
             addpercent += 0.005;
         }
         document.getElementById("score").innerHTML = score;
     };
-    if (blowpercent >= 0.5) {
-        level += 1;
-        document.getElementById("level").innerHTML = level;
-    }
     return score;
 }
 var sell = function () {
