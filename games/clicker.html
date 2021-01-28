@@ -13,12 +13,36 @@
             border-radius: 140px;
             font-size: 20px;
         }
+        button.sell-button {
+            height: 40px;
+            width: 60px;
+            border-radius: 10px;
+        }
+        p {
+            font-family: 'Times New Roman', 'Microsoft Sans Serif', Arial, Helvetica, sans-serif;
+            font-size: 30px;
+        }
     </style>
     <script type="text/javascript">
+        var blowpercent = 0.05;
+        var level = 1;
+        var newlevelcoins = 10
         var clicked = function () {
-            var score = document.getElementById("score").innerHTML;
-            score++;
-            document.getElementById("score").innerHTML = score;
+            var meter = document.getElementById("meter");
+            meter.value += blowpercent;
+            if (meter.value >= 1) {
+                var score = document.getElementById("score").innerHTML;
+                score++;
+                meter.value = meter.value % blowpercent;
+                blowpercent += 0.002;
+                if (blowpercent === 0.8) {
+                    blowpercent = 0.1;
+                }
+                document.getElementById("score").innerHTML = score;
+            };
+            if (blowpercent >= 0.5) {
+                level += 1;
+            }
             return score;
         }
         var sell = function () {
@@ -28,6 +52,10 @@
             score = score % 3;
             document.getElementById("score").innerHTML = score;
             document.getElementById("coins").innerHTML = coins;
+            if (coins >= newlevelcoins) {
+                newlevelcoins *= 1.5;
+                level += 1;
+            }
             return score;
         }
     </script>
@@ -35,8 +63,12 @@
 </head>
 <body>
     <h1>Clicker</h1>
-    <p>Balloons: <span id="score">0</span><br />Coins: <span id="coins">0</span></p>
-    <button class="clicker" onclick="clicked();">Click To Get Balloons!</button> 
-    <button onclick="sell();">Sell!</button>
+    <p>Level: <span id="level">1</span><br />
+    Balloons: <span id="score">0</span><br />
+    Coins: <span id="coins">0</span></p>
+    <button class="clicker" onclick="clicked();">Click To Blow Balloons!</button>
+    <meter value="0" id="meter"></meter>
+    <br />
+    <button class="sell-button" onclick="sell();">Sell!</button>
 </body>
 </html>
