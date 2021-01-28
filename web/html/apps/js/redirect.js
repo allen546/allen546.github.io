@@ -1,7 +1,8 @@
 // JavaScript source code
 var redirect = function (url) {
     alert("You are about to be redirected to " + url);
-    window.location = url;
+    var win = window.open(url, '_blank');
+    win.focus();
     return url;
 };
 var redirect_to_w3schools = function () {
