@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="apps/css/style.css" type="text/css" />
+    <script type="text/javascript" src="../apps/js/jquery.js"></script>
+    <script type="text/javascript" src="../apps/js/jquery-ui/jquery-ui.min.js"></script>
+    <style>
+        button.clicker {
+            height: 140px;
+            width: 140px;
+            border-radius: 140px;
+            font-size: 20px;
+        }
+    </style>
+    <script type="text/javascript">
+        var clicked = function () {
+            var score = document.getElementById("score").innerHTML;
+            score++;
+            document.getElementById("score").innerHTML = score;
+            return score;
+        }
+        var sell = function () {
+            var score = document.getElementById("score").innerHTML;
+            var coins = parseInt(document.getElementById("coins").innerHTML);
+            coins += Math.floor(score / 3);
+            score = score % 3;
+            document.getElementById("score").innerHTML = score;
+            document.getElementById("coins").innerHTML = coins;
+            return score;
+        }
+    </script>
+    <title>Clicker</title>
+</head>
+<body>
+    <h1>Clicker</h1>
+    <p>Balloons: <span id="score">0</span><br />Coins: <span id="coins">0</span></p>
+    <button class="clicker" onclick="clicked();">Click To Get Balloons!</button> 
+    <button onclick="sell();">Sell!</button>
+</body>
+</html>
