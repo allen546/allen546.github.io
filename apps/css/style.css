@@ -1,4 +1,4 @@
-﻿a[href] {
+a[href] {
     text-decoration: none;
     color: blue;
 }
@@ -30,6 +30,8 @@ code {
 }
 body {
     background-color: rgb(91, 194, 238);
+    margin-left: 30px;
+    margin-right: 30px;
 }
 button {
     background-color: #7fff88;
