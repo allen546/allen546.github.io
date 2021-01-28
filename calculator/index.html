@@ -5,14 +5,19 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="../apps/css/style.css" />
     <title>Calculator</title>
+    <script>
+        function calculate() {
+            var expr = document.getElementById("expr").value;
+            var output = eval(expr);
+            document.getElementById("output").innerHTML = output;
+        }
+
+    </script>
 </head>
 <body>
     <h1>Calculator</h1>
-    <ol>
-        <li><a href="adder.html">Add!</a></li>
-        <li><a href="subtracter.html">Subtract!</a></li>
-        <li><a href="multiplyer.html">Multiply!</a></li>
-        <li><a href="divider.html">Divide!</a></li>
-    </ol>
+    <label>Enter Expression: </label><input type="text"  id="expr"/>
+    <button onclick="calculate();">Calculate!</button>
+    <p>Output: <output id="output">???</output></p>
 </body>
 </html>
