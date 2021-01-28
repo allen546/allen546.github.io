@@ -3,62 +3,10 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="../apps/css/style.css" type="text/css" />
     <link rel="stylesheet" href="apps/css/style.css" type="text/css" />
-    <script type="text/javascript" src="../apps/js/jquery.js"></script>
-    <script type="text/javascript" src="../apps/js/jquery-ui/jquery-ui.min.js"></script>
-    <style>
-        button.clicker {
-            height: 140px;
-            width: 140px;
-            border-radius: 140px;
-            font-size: 20px;
-        }
-        button.sell-button {
-            height: 40px;
-            width: 60px;
-            border-radius: 10px;
-        }
-        p {
-            font-family: 'Times New Roman', 'Microsoft Sans Serif', Arial, Helvetica, sans-serif;
-            font-size: 30px;
-        }
-    </style>
-    <script type="text/javascript">
-        var blowpercent = 0.05;
-        var level = 1;
-        var newlevelcoins = 10
-        var clicked = function () {
-            var meter = document.getElementById("meter");
-            meter.value += blowpercent;
-            if (meter.value >= 1) {
-                var score = document.getElementById("score").innerHTML;
-                score++;
-                meter.value = meter.value % blowpercent;
-                blowpercent += 0.002;
-                if (blowpercent === 0.8) {
-                    blowpercent = 0.1;
-                }
-                document.getElementById("score").innerHTML = score;
-            };
-            if (blowpercent >= 0.5) {
-                level += 1;
-            }
-            return score;
-        }
-        var sell = function () {
-            var score = document.getElementById("score").innerHTML;
-            var coins = parseInt(document.getElementById("coins").innerHTML);
-            coins += Math.floor(score / 3);
-            score = score % 3;
-            document.getElementById("score").innerHTML = score;
-            document.getElementById("coins").innerHTML = coins;
-            if (coins >= newlevelcoins) {
-                newlevelcoins *= 1.5;
-                level += 1;
-            }
-            return score;
-        }
-    </script>
+    <link rel="stylesheet" href="apps/css/clicker.css" type="text/css" />
+    <script type="text/javascript" src="apps/js/clicker.js"></script>
     <title>Clicker</title>
 </head>
 <body>
@@ -70,5 +18,13 @@
     <meter value="0" id="meter"></meter>
     <br />
     <button class="sell-button" onclick="sell();">Sell!</button>
+    <br />
+    <p>Auto-Clickers:</p>
+    <ol>
+        <li>1 click per 5 seconds. Coins Needed: 50 <button onclick="buy(1);">Buy</button></li>
+        <li>1 click per 3 seconds. Coins Needed: 70 <button onclick="buy(2);">Buy</button></li>
+        <li>1 click per 1 seconds. Coins Needed: 100 <button onclick="buy(3);">Buy</button></li>
+    </ol>
+    <p id="warning"></p>
 </body>
 </html>

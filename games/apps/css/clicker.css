@@ -1,0 +1,17 @@
+﻿button.clicker {
+    height: 140px;
+    width: 140px;
+    border-radius: 140px;
+    font-size: 20px;
+}
+
+button.sell-button {
+    height: 40px;
+    width: 60px;
+    border-radius: 10px;
+}
+
+p {
+    font-family: 'Times New Roman', 'Microsoft Sans Serif', Arial, Helvetica, sans-serif;
+    font-size: 30px;
+}
