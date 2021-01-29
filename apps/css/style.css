@@ -47,3 +47,6 @@ button {
 .red, .warning {
     color: red;
 }
+.highlight-warning {
+    background-color: red;   
+}
