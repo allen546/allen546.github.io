@@ -44,3 +44,6 @@ button {
     background-color: #7fff88;
     border-radius: 7px;
 }
+.red, .warning {
+    color: red;
+}
