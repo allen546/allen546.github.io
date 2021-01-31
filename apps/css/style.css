@@ -1,6 +1,9 @@
 h1 {
     font-size: 40px;
 }
+h3 {
+    font-size: 25px;
+}
 a[href] {
     text-decoration: none;
     color: blue;
