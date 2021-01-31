@@ -7,7 +7,7 @@ a[href] {
 }
 p {
     color: #000000;
-    font-size: 18px;
+    font-size: 20px;
     font-family: Calibri, Arial, Helvetica,sans-serif;
     font-display: auto;
     font-weight: normal;
@@ -23,16 +23,16 @@ small {
     text-align: center;
 }
 pre {
-    font-size: 18px;
+    font-size: 20px;
     border: 2px solid #9ea3a7;
-    border-radius: 20px;
+    border-radius: 22px;
     padding: 14px;
     background-color: #9ea3a7;
     color: black;
     white-space: pre-wrap;
 }
 code {
-    font-size: 18px;
+    font-size: 20px;
     border: 2px solid #9ea3a7;
     border-radius: 10px;
     background-color: #9ea3a7;
