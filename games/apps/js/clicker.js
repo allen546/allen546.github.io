@@ -8,7 +8,7 @@ var clicked = function () {
     meter.value += blowpercent;
     if (meter.value >= 1) {
         var exploded = Math.random()*100;
-        if (exploded <= 99){
+        if (exploded >= 99){
             alert("气球吹爆了");
             meter.value = 0;
             return;
