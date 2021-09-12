@@ -7,6 +7,11 @@ var clicked = function () {
     var meter = document.getElementById("meter");
     meter.value += blowpercent;
     if (meter.value >= 1) {
+        var exploded = Math.random()*100;
+        if (exploded >= 99){
+            alert("气球吹爆了");
+            return;
+        }
         var score = document.getElementById("score").innerHTML;
         score++;
         meter.value = meter.value % blowpercent;
