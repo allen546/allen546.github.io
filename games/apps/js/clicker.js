@@ -10,6 +10,7 @@ var clicked = function () {
         var exploded = Math.random()*100;
         if (exploded <= 99){
             alert("气球吹爆了");
+            meter.value = 0;
             return;
         }
         var score = document.getElementById("score").innerHTML;
