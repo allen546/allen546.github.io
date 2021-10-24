@@ -8,7 +8,7 @@ var clicked = function () {
     meter.value += blowpercent;
     if (meter.value >= 1) {
         var exploded = Math.random()*100;
-        if (exploded >= 99){
+        if (exploded >= 98){
             alert("气球吹爆了");
             meter.value = 0;
             return;
@@ -49,14 +49,14 @@ var buy = function (objectid) {
                 return;
             };
             secs = 5;
-            coins -= 30;
+            coins -= 15;
             break;
         case 2:
             if (coins < 25) {
                 document.getElementById("warning").innerHTML = "Error: Not Enough Coins.";
                 return;
             };
-            coins -= 50;
+            coins -= 25;
             secs = 3;
             break;
         case 3:
@@ -64,7 +64,7 @@ var buy = function (objectid) {
                 document.getElementById("warning").innerHTML = "Error: Not Enough Coins.";
                 return;
             };
-            coins -= 70;
+            coins -= 35;
             secs = 1;
             break;
     };
