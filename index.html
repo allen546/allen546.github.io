@@ -1,21 +1,3727 @@
-﻿<!DOCYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="apps/css/style.css" />
-    <title>allen546.github.io</title>
-    <meta id="viewport" name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1; user-scalable=no;" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    
+    <!-- MathJax for rendering LaTeX formulas -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #667eea;
+    --primary-dark: #5568d3;
+    --secondary-color: #764ba2;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --bg-color: #f9fafb;
+    --white: #ffffff;
+    --border-color: #e5e7eb;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: var(--white);
+    padding: 40px 30px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.panel {
+    padding: 40px 30px;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Settings Panel */
+.settings-group {
+    margin-bottom: 25px;
+}
+
+.settings-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.settings-group input,
+.settings-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.settings-group input:focus,
+.settings-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Buttons */
+.btn {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: var(--white);
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Quiz Panel */
+.quiz-header {
+    margin-bottom: 30px;
+}
+
+#question-counter {
+    display: block;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.4s ease;
+}
+
+.question-card {
+    background: var(--bg-color);
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.question-category {
+    display: inline-block;
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.question-text {
+    font-size: 1.4rem;
+    color: var(--text-color);
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.options-container {
+    display: grid;
+    gap: 15px;
+}
+
+.option {
+    padding: 18px 22px;
+    background: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.option:hover {
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.option-letter {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-color);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.option-text {
+    font-size: 1.05rem;
+    color: var(--text-color);
+}
+
+.option.selected {
+    border-color: var(--primary-color);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.quiz-actions {
+    margin-top: 30px;
+}
+
+/* Results Panel */
+.score-display {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.score-circle {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+}
+
+.score-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--white);
+}
+
+#score-percentage {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.score-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.score-details {
+    font-size: 1.2rem;
+    color: var(--text-light);
+}
+
+.score-details strong {
+    color: var(--primary-color);
+}
+
+.detailed-results {
+    margin: 30px 0;
+}
+
+.result-item {
+    background: var(--bg-color);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--border-color);
+}
+
+.result-item.correct {
+    border-left-color: var(--success-color);
+}
+
+.result-item.incorrect {
+    border-left-color: var(--error-color);
+}
+
+.result-question {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.result-answer {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin: 5px 0;
+}
+
+.result-answer.correct-answer {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.result-answer.wrong-answer {
+    color: var(--error-color);
+    text-decoration: line-through;
+}
+
+footer {
+    background: var(--bg-color);
+    padding: 20px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .panel {
+        padding: 30px 20px;
+    }
+
+    .question-text {
+        font-size: 1.2rem;
+    }
+
+    .score-circle {
+        width: 160px;
+        height: 160px;
+    }
+
+    #score-percentage {
+        font-size: 2.5rem;
+    }
+}
+
+/* MathJax formula styling */
+.MathJax {
+    font-size: 1.1em !important;
+}
+
+mjx-container {
+    display: inline-block;
+    margin: 0 2px;
+}
+
+.question-text mjx-container,
+.option-text mjx-container {
+    vertical-align: middle;
+}
+    </style>
 </head>
-    <body>
-        <h1>Hello!</h1>
-        <div id="contents">
-            <h3>Table Of Contents</h3>
-            <ol>
-                <li><a href="/calculator">A Simple Calculator</a></li>
-                <li><a href="/games">Play Games</a></li>
-                <li><a href="/timer">Timer</a></li>
-                <li><a href="https://gitee.com/allenhaha/chat-tool/releases/tag/v1.0">Download ChatTool</a></li>
-            </ol>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Interactive Quiz</h1>
+            <p class="subtitle">Test your knowledge across various topics</p>
+        </header>
+
+        <!-- Settings Panel -->
+        <div id="settings-panel" class="panel">
+            <h2>Quiz Settings</h2>
+            <div class="settings-group">
+                <label for="question-count">Number of Questions:</label>
+                <input type="number" id="question-count" min="1" max="50" value="10">
+            </div>
+            <div class="settings-group">
+                <label for="category-filter">Category (optional):</label>
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <button id="start-quiz-btn" class="btn btn-primary">Start Quiz</button>
         </div>
-    </body>
+
+        <!-- Quiz Panel -->
+        <div id="quiz-panel" class="panel hidden">
+            <div class="quiz-header">
+                <div class="progress-info">
+                    <span id="question-counter">Question 1 of 10</span>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-content">
+                <div class="question-card">
+                    <div class="question-category" id="question-category"></div>
+                    <h3 id="question-text" class="question-text"></h3>
+                    <div id="options-container" class="options-container"></div>
+                    <div class="quiz-actions">
+                        <button id="next-btn" class="btn btn-primary" disabled>Next Question</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div id="results-panel" class="panel hidden">
+            <h2>Quiz Results</h2>
+            <div class="score-display">
+                <div class="score-circle">
+                    <div class="score-text">
+                        <span id="score-percentage">0%</span>
+                        <span class="score-label">Score</span>
+                    </div>
+                </div>
+                <div class="score-details">
+                    <p><strong id="correct-count">0</strong> correct out of <strong id="total-count">0</strong> questions</p>
+                </div>
+            </div>
+
+            <div id="detailed-results" class="detailed-results"></div>
+
+            <button id="restart-btn" class="btn btn-primary">Start New Quiz</button>
+        </div>
+
+        <footer>
+            <p>Made with ❤️ for learning</p>
+        </footer>
+    </div>
+
+    <script>
+// All questions data embedded in the page
+const ALL_QUESTIONS = [
+  {
+    "id": 1,
+    "question": "在提瓦特大陆上，弱元素含有多少元素量？",
+    "option_a": "0.5U",
+    "option_b": "1U",
+    "option_c": "1.5U",
+    "option_d": "2U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 2,
+    "question": "强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 3,
+    "question": "在增幅反应中，水元素攻击引发蒸发反应时的增幅反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 4,
+    "question": "火元素攻击引发融化反应时的增幅反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 5,
+    "question": "超载反应的剧变反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.75",
+    "option_d": "3",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 6,
+    "question": "超导反应会降低目标的什么抗性？",
+    "option_a": "元素抗性",
+    "option_b": "物理抗性",
+    "option_c": "雷元素抗性",
+    "option_d": "冰元素抗性",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 7,
+    "question": "感电反应每隔多长时间结算一次伤害？",
+    "option_a": "0.5秒",
+    "option_b": "1秒",
+    "option_c": "1.5秒",
+    "option_d": "2秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 8,
+    "question": "燃烧反应的剧变反应系数是多少（单次结算）？",
+    "option_a": "0.25",
+    "option_b": "0.5",
+    "option_c": "1",
+    "option_d": "2",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 9,
+    "question": "冻结元素的基础衰减速率是多少？",
+    "option_a": "200mU·s⁻¹",
+    "option_b": "300mU·s⁻¹",
+    "option_c": "400mU·s⁻¹",
+    "option_d": "500mU·s⁻¹",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 10,
+    "question": "当冻结元素低于多少时，碎冰反应无法结算伤害？",
+    "option_a": "0.3U",
+    "option_b": "0.5U",
+    "option_c": "0.8U",
+    "option_d": "1U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 11,
+    "question": "碎冰反应的剧变反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 12,
+    "question": "扩散反应的剧变反应系数是多少？",
+    "option_a": "0.4",
+    "option_b": "0.6",
+    "option_c": "0.8",
+    "option_d": "1",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 13,
+    "question": "绽放反应的剧变反应系数是多少？",
+    "option_a": "1",
+    "option_b": "1.5",
+    "option_c": "2",
+    "option_d": "3",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 14,
+    "question": "超绽放反应和烈绽放反应的剧变反应系数是多少？",
+    "option_a": "2",
+    "option_b": "2.5",
+    "option_c": "3",
+    "option_d": "3.5",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 15,
+    "question": "当场地上已经存在多少枚草原核后，继续生成草原核时会引爆最早生成的一枚？",
+    "option_a": "3枚",
+    "option_b": "4枚",
+    "option_c": "5枚",
+    "option_d": "6枚",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 16,
+    "question": "结晶反应对于一个独立单位，每隔多长时间最多触发1次？",
+    "option_a": "0.5秒",
+    "option_b": "1秒",
+    "option_c": "1.5秒",
+    "option_d": "2秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 17,
+    "question": "超激化反应的激化反应系数是多少？",
+    "option_a": "0.8",
+    "option_b": "1",
+    "option_c": "1.15",
+    "option_d": "1.25",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 18,
+    "question": "蔓激化反应的激化反应系数是多少？",
+    "option_a": "1",
+    "option_b": "1.15",
+    "option_c": "1.25",
+    "option_d": "1.5",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 19,
+    "question": "对于nU激化元素，其最长附着时间的计算公式是什么？",
+    "option_a": "t(n)=3n+6",
+    "option_b": "t(n)=4n+6",
+    "option_c": "t(n)=5n+6",
+    "option_d": "t(n)=6n+6",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 20,
+    "question": "在元素克制关系中，哪个元素克制水元素？",
+    "option_a": "火元素",
+    "option_b": "冰元素",
+    "option_c": "草元素",
+    "option_d": "雷元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 21,
+    "question": "什么是\"触发元素不残留原则\"？",
+    "option_a": "触发元素在反应后会残留一半",
+    "option_b": "触发元素即使过量也不会残留",
+    "option_c": "触发元素总是会残留",
+    "option_d": "触发元素只在增幅反应中不残留",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 22,
+    "question": "燃烧反应触发时会发生什么？",
+    "option_a": "立即造成伤害并扣除元素量",
+    "option_b": "产生燃烧元素但不扣除元素量",
+    "option_c": "扣除草元素但不扣除火元素",
+    "option_d": "同时扣除火元素和草元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 23,
+    "question": "关于激化元素的特性，以下哪项是正确的？",
+    "option_a": "激化元素不能与其他元素共存",
+    "option_b": "激化元素可以与雷元素、草元素共存",
+    "option_c": "激化元素只能与火元素共存",
+    "option_d": "激化元素会立即消失",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 24,
+    "question": "为什么元素精通存在\"稀释\"现象？",
+    "option_a": "元素精通收益是固定值",
+    "option_b": "元素精通越高，继续增加的相对收益越低",
+    "option_c": "元素精通没有任何收益上限",
+    "option_d": "元素精通收益呈线性增长",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 25,
+    "question": "在感电反应中，雷元素和水元素的关系是什么？",
+    "option_a": "只有雷元素是附着元素",
+    "option_b": "只有水元素是附着元素",
+    "option_c": "两种元素均被视为附着元素",
+    "option_d": "两种元素会立即消失",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 26,
+    "question": "扩散反应的主要作用是什么？",
+    "option_a": "只造成伤害",
+    "option_b": "补充元素量并扩散到更大范围",
+    "option_c": "降低敌人防御力",
+    "option_d": "提高角色攻击力",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 27,
+    "question": "增幅反应与原有伤害的关系是什么？",
+    "option_a": "加算关系",
+    "option_b": "乘算关系",
+    "option_c": "减算关系",
+    "option_d": "无关系",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 28,
+    "question": "冻结反应对敌人的主要效果是什么？",
+    "option_a": "造成大量伤害",
+    "option_b": "降低敌人抗性",
+    "option_c": "强制暂停敌人行动",
+    "option_d": "提高队伍攻击力",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 29,
+    "question": "草原核被火元素攻击会触发什么反应？",
+    "option_a": "超绽放反应",
+    "option_b": "烈绽放反应",
+    "option_c": "燃烧反应",
+    "option_d": "融化反应",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 30,
+    "question": "草原核被雷元素攻击会触发什么反应？",
+    "option_a": "超绽放反应",
+    "option_b": "烈绽放反应",
+    "option_c": "超载反应",
+    "option_d": "感电反应",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 31,
+    "question": "超激化反应和蔓激化反应会消耗元素吗？",
+    "option_a": "会消耗所有元素",
+    "option_b": "只消耗激化元素",
+    "option_c": "不消耗任何元素",
+    "option_d": "只消耗一半元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 32,
+    "question": "剧变反应的伤害与以下哪项因素无关？",
+    "option_a": "角色等级",
+    "option_b": "元素精通",
+    "option_c": "攻击力",
+    "option_d": "敌方抗性",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 33,
+    "question": "当雷元素和水元素共同附着时，哪种元素的反应优先级更高？",
+    "option_a": "水元素",
+    "option_b": "雷元素",
+    "option_c": "两者相同",
+    "option_d": "取决于元素量",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 34,
+    "question": "燃烧元素附着的特点是什么？",
+    "option_a": "可以被补充和刷新",
+    "option_b": "含固定元素量，不可补充也不随时间衰减",
+    "option_c": "会随时间快速衰减",
+    "option_d": "可以与所有元素共存",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 35,
+    "question": "双计数器中的计次器是什么规则？",
+    "option_a": "每2次攻击中1次能附着元素",
+    "option_b": "每3次攻击中1次能附着元素",
+    "option_c": "每4次攻击中1次能附着元素",
+    "option_d": "每5次攻击中1次能附着元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 36,
+    "question": "元素量叠加时，如果向已附着基本元素的目标再次附着该元素会发生什么？",
+    "option_a": "元素量相加",
+    "option_b": "元素量取较大值，衰减速率继承",
+    "option_c": "元素量取较小值",
+    "option_d": "元素量归零",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 37,
+    "question": "旅行者·风的元素转化判定顺序是什么？",
+    "option_a": "火、水、雷、冰",
+    "option_b": "冰、火、水、雷",
+    "option_c": "水、火、冰、雷",
+    "option_d": "雷、冰、火、水",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 38,
+    "question": "以下关于碎冰反应的说法，哪项是正确的？",
+    "option_a": "碎冰反应造成元素伤害",
+    "option_b": "碎冰反应造成物理伤害",
+    "option_c": "碎冰反应不造成任何伤害",
+    "option_d": "碎冰反应造成冰元素伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 39,
+    "question": "在绽放反应中，草原核爆炸会对谁造成伤害？",
+    "option_a": "只对敌人造成伤害",
+    "option_b": "同时对触发者造成伤害",
+    "option_c": "只对触发者造成伤害",
+    "option_d": "不造成任何伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 40,
+    "question": "月感电反应中，雷暴云的存在时间是多少秒？",
+    "option_a": "4秒",
+    "option_b": "5秒",
+    "option_c": "6秒",
+    "option_d": "7秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 41,
+    "question": "状态元素是什么？",
+    "option_a": "基本元素的一种",
+    "option_b": "持续反应的根本表征",
+    "option_c": "临时的元素附着",
+    "option_d": "不存在的概念",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 42,
+    "question": "什么情况下会触发结晶反应？",
+    "option_a": "风元素与任意元素接触",
+    "option_b": "岩元素与火、水、雷、冰元素接触",
+    "option_c": "草元素与水元素接触",
+    "option_d": "雷元素与火元素接触",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 43,
+    "question": "冻结元素的衰减速率有什么特点？",
+    "option_a": "恒定不变",
+    "option_b": "随时间变化而不随元素量变化",
+    "option_c": "随元素量变化而不随时间变化",
+    "option_d": "既不随时间也不随元素量变化",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 44,
+    "question": "水元素的扩散反应有什么特殊之处？",
+    "option_a": "不造成任何伤害",
+    "option_b": "只对被扩散单位造成伤害，对其它单位只提供元素附着",
+    "option_c": "对所有单位造成相同伤害",
+    "option_d": "只提供元素附着不造成伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 45,
+    "question": "原激化反应会造成伤害提升吗？",
+    "option_a": "会造成大量伤害提升",
+    "option_b": "会造成少量伤害提升",
+    "option_c": "不造成伤害提升",
+    "option_d": "会降低伤害",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 46,
+    "question": "在元素克制关系中，单次反应消耗元素量比例是多少？",
+    "option_a": "1:1",
+    "option_b": "1:2",
+    "option_c": "2:1",
+    "option_d": "1:3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 47,
+    "question": "激化反应将在哪个伤害乘区追加效果？",
+    "option_a": "增伤区",
+    "option_b": "暴击区",
+    "option_c": "基础伤害区",
+    "option_d": "抗性区",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 48,
+    "question": "提瓦特大陆上有多少种基本元素？",
+    "option_a": "5种",
+    "option_b": "6种",
+    "option_c": "7种",
+    "option_d": "8种",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 49,
+    "question": "以下哪种元素不能附着在实体单位上？",
+    "option_a": "火元素",
+    "option_b": "风元素",
+    "option_c": "水元素",
+    "option_d": "雷元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 50,
+    "question": "在提瓦特大陆上，弱元素含有多少元素量？",
+    "option_a": "0.5U",
+    "option_b": "1U",
+    "option_c": "1.5U",
+    "option_d": "2U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 51,
+    "question": "强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 52,
+    "question": "在增幅反应中，水元素攻击引发蒸发反应时的增幅反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 53,
+    "question": "火元素攻击引发融化反应时的增幅反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 54,
+    "question": "超载反应的剧变反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.75",
+    "option_d": "3",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 55,
+    "question": "超导反应会降低目标的什么抗性？",
+    "option_a": "元素抗性",
+    "option_b": "物理抗性",
+    "option_c": "雷元素抗性",
+    "option_d": "冰元素抗性",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 56,
+    "question": "感电反应每隔多长时间结算一次伤害？",
+    "option_a": "0.5秒",
+    "option_b": "1秒",
+    "option_c": "1.5秒",
+    "option_d": "2秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 57,
+    "question": "燃烧反应的剧变反应系数是多少（单次结算）？",
+    "option_a": "0.25",
+    "option_b": "0.5",
+    "option_c": "1",
+    "option_d": "2",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 58,
+    "question": "冻结元素的基础衰减速率是多少？",
+    "option_a": "200mU·s⁻¹",
+    "option_b": "300mU·s⁻¹",
+    "option_c": "400mU·s⁻¹",
+    "option_d": "500mU·s⁻¹",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 59,
+    "question": "当冻结元素低于多少时，碎冰反应无法结算伤害？",
+    "option_a": "0.3U",
+    "option_b": "0.5U",
+    "option_c": "0.8U",
+    "option_d": "1U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 60,
+    "question": "碎冰反应的剧变反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 61,
+    "question": "扩散反应的剧变反应系数是多少？",
+    "option_a": "0.4",
+    "option_b": "0.6",
+    "option_c": "0.8",
+    "option_d": "1",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 62,
+    "question": "绽放反应的剧变反应系数是多少？",
+    "option_a": "1",
+    "option_b": "1.5",
+    "option_c": "2",
+    "option_d": "3",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 63,
+    "question": "超绽放反应和烈绽放反应的剧变反应系数是多少？",
+    "option_a": "2",
+    "option_b": "2.5",
+    "option_c": "3",
+    "option_d": "3.5",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 64,
+    "question": "当场地上已经存在多少枚草原核后，继续生成草原核时会引爆最早生成的一枚？",
+    "option_a": "3枚",
+    "option_b": "4枚",
+    "option_c": "5枚",
+    "option_d": "6枚",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 65,
+    "question": "结晶反应对于一个独立单位，每隔多长时间最多触发1次？",
+    "option_a": "0.5秒",
+    "option_b": "1秒",
+    "option_c": "1.5秒",
+    "option_d": "2秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 66,
+    "question": "超激化反应的激化反应系数是多少？",
+    "option_a": "0.8",
+    "option_b": "1",
+    "option_c": "1.15",
+    "option_d": "1.25",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 67,
+    "question": "蔓激化反应的激化反应系数是多少？",
+    "option_a": "1",
+    "option_b": "1.15",
+    "option_c": "1.25",
+    "option_d": "1.5",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 68,
+    "question": "对于nU激化元素，其最长附着时间的计算公式是什么？",
+    "option_a": "t(n)=3n+6",
+    "option_b": "t(n)=4n+6",
+    "option_c": "t(n)=5n+6",
+    "option_d": "t(n)=6n+6",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 69,
+    "question": "在元素克制关系中，哪个元素克制水元素？",
+    "option_a": "火元素",
+    "option_b": "冰元素",
+    "option_c": "草元素",
+    "option_d": "雷元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 70,
+    "question": "什么是\"触发元素不残留原则\"？",
+    "option_a": "触发元素在反应后会残留一半",
+    "option_b": "触发元素即使过量也不会残留",
+    "option_c": "触发元素总是会残留",
+    "option_d": "触发元素只在增幅反应中不残留",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 71,
+    "question": "燃烧反应触发时会发生什么？",
+    "option_a": "立即造成伤害并扣除元素量",
+    "option_b": "产生燃烧元素但不扣除元素量",
+    "option_c": "扣除草元素但不扣除火元素",
+    "option_d": "同时扣除火元素和草元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 72,
+    "question": "关于激化元素的特性，以下哪项是正确的？",
+    "option_a": "激化元素不能与其他元素共存",
+    "option_b": "激化元素可以与雷元素、草元素共存",
+    "option_c": "激化元素只能与火元素共存",
+    "option_d": "激化元素会立即消失",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 73,
+    "question": "为什么元素精通存在\"稀释\"现象？",
+    "option_a": "元素精通收益是固定值",
+    "option_b": "元素精通越高，继续增加的相对收益越低",
+    "option_c": "元素精通没有任何收益上限",
+    "option_d": "元素精通收益呈线性增长",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 74,
+    "question": "在感电反应中，雷元素和水元素的关系是什么？",
+    "option_a": "只有雷元素是附着元素",
+    "option_b": "只有水元素是附着元素",
+    "option_c": "两种元素均被视为附着元素",
+    "option_d": "两种元素会立即消失",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 75,
+    "question": "扩散反应的主要作用是什么？",
+    "option_a": "只造成伤害",
+    "option_b": "补充元素量并扩散到更大范围",
+    "option_c": "降低敌人防御力",
+    "option_d": "提高角色攻击力",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 76,
+    "question": "增幅反应与原有伤害的关系是什么？",
+    "option_a": "加算关系",
+    "option_b": "乘算关系",
+    "option_c": "减算关系",
+    "option_d": "无关系",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 77,
+    "question": "冻结反应对敌人的主要效果是什么？",
+    "option_a": "造成大量伤害",
+    "option_b": "降低敌人抗性",
+    "option_c": "强制暂停敌人行动",
+    "option_d": "提高队伍攻击力",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 78,
+    "question": "草原核被火元素攻击会触发什么反应？",
+    "option_a": "超绽放反应",
+    "option_b": "烈绽放反应",
+    "option_c": "燃烧反应",
+    "option_d": "融化反应",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 79,
+    "question": "草原核被雷元素攻击会触发什么反应？",
+    "option_a": "超绽放反应",
+    "option_b": "烈绽放反应",
+    "option_c": "超载反应",
+    "option_d": "感电反应",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 80,
+    "question": "超激化反应和蔓激化反应会消耗元素吗？",
+    "option_a": "会消耗所有元素",
+    "option_b": "只消耗激化元素",
+    "option_c": "不消耗任何元素",
+    "option_d": "只消耗一半元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 81,
+    "question": "剧变反应的伤害与以下哪项因素无关？",
+    "option_a": "角色等级",
+    "option_b": "元素精通",
+    "option_c": "攻击力",
+    "option_d": "敌方抗性",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 82,
+    "question": "当雷元素和水元素共同附着时，哪种元素的反应优先级更高？",
+    "option_a": "水元素",
+    "option_b": "雷元素",
+    "option_c": "两者相同",
+    "option_d": "取决于元素量",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 83,
+    "question": "燃烧元素附着的特点是什么？",
+    "option_a": "可以被补充和刷新",
+    "option_b": "含固定元素量，不可补充也不随时间衰减",
+    "option_c": "会随时间快速衰减",
+    "option_d": "可以与所有元素共存",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 84,
+    "question": "双计数器中的计次器是什么规则？",
+    "option_a": "每2次攻击中1次能附着元素",
+    "option_b": "每3次攻击中1次能附着元素",
+    "option_c": "每4次攻击中1次能附着元素",
+    "option_d": "每5次攻击中1次能附着元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 85,
+    "question": "元素量叠加时，如果向已附着基本元素的目标再次附着该元素会发生什么？",
+    "option_a": "元素量相加",
+    "option_b": "元素量取较大值，衰减速率继承",
+    "option_c": "元素量取较小值",
+    "option_d": "元素量归零",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 86,
+    "question": "旅行者·风的元素转化判定顺序是什么？",
+    "option_a": "火、水、雷、冰",
+    "option_b": "冰、火、水、雷",
+    "option_c": "水、火、冰、雷",
+    "option_d": "雷、冰、火、水",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 87,
+    "question": "以下关于碎冰反应的说法，哪项是正确的？",
+    "option_a": "碎冰反应造成元素伤害",
+    "option_b": "碎冰反应造成物理伤害",
+    "option_c": "碎冰反应不造成任何伤害",
+    "option_d": "碎冰反应造成冰元素伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 88,
+    "question": "在绽放反应中，草原核爆炸会对谁造成伤害？",
+    "option_a": "只对敌人造成伤害",
+    "option_b": "同时对触发者造成伤害",
+    "option_c": "只对触发者造成伤害",
+    "option_d": "不造成任何伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 89,
+    "question": "月感电反应中，雷暴云的存在时间是多少秒？",
+    "option_a": "4秒",
+    "option_b": "5秒",
+    "option_c": "6秒",
+    "option_d": "7秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 90,
+    "question": "状态元素是什么？",
+    "option_a": "基本元素的一种",
+    "option_b": "持续反应的根本表征",
+    "option_c": "临时的元素附着",
+    "option_d": "不存在的概念",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 91,
+    "question": "什么情况下会触发结晶反应？",
+    "option_a": "风元素与任意元素接触",
+    "option_b": "岩元素与火、水、雷、冰元素接触",
+    "option_c": "草元素与水元素接触",
+    "option_d": "雷元素与火元素接触",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 92,
+    "question": "冻结元素的衰减速率有什么特点？",
+    "option_a": "恒定不变",
+    "option_b": "随时间变化而不随元素量变化",
+    "option_c": "随元素量变化而不随时间变化",
+    "option_d": "既不随时间也不随元素量变化",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 93,
+    "question": "水元素的扩散反应有什么特殊之处？",
+    "option_a": "不造成任何伤害",
+    "option_b": "只对被扩散单位造成伤害，对其它单位只提供元素附着",
+    "option_c": "对所有单位造成相同伤害",
+    "option_d": "只提供元素附着不造成伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 94,
+    "question": "原激化反应会造成伤害提升吗？",
+    "option_a": "会造成大量伤害提升",
+    "option_b": "会造成少量伤害提升",
+    "option_c": "不造成伤害提升",
+    "option_d": "会降低伤害",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 95,
+    "question": "在元素克制关系中，单次反应消耗元素量比例是多少？",
+    "option_a": "1:1",
+    "option_b": "1:2",
+    "option_c": "2:1",
+    "option_d": "1:3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 96,
+    "question": "激化反应将在哪个伤害乘区追加效果？",
+    "option_a": "增伤区",
+    "option_b": "暴击区",
+    "option_c": "基础伤害区",
+    "option_d": "抗性区",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 97,
+    "question": "提瓦特大陆上有多少种基本元素？",
+    "option_a": "5种",
+    "option_b": "6种",
+    "option_c": "7种",
+    "option_d": "8种",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 98,
+    "question": "以下哪种元素不能附着在实体单位上？",
+    "option_a": "火元素",
+    "option_b": "风元素",
+    "option_c": "水元素",
+    "option_d": "雷元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 99,
+    "question": "中元素含有的元素量是多少？",
+    "option_a": "0.5U",
+    "option_b": "1U",
+    "option_c": "1.5U",
+    "option_d": "2U",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 100,
+    "question": "超强元素含有的元素量是多少？",
+    "option_a": "2U",
+    "option_b": "3U",
+    "option_c": "4U",
+    "option_d": "5U",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 101,
+    "question": "元素量叠加时，如果向已附着基本元素的目标再次附着相同元素，会发生什么？",
+    "option_a": "元素量相加",
+    "option_b": "元素量取较大值，衰减速率继承",
+    "option_c": "元素量取较小值",
+    "option_d": "元素量归零",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 102,
+    "question": "燃烧元素的衰减特点是什么？",
+    "option_a": "随时间快速衰减",
+    "option_b": "随元素量变化",
+    "option_c": "含固定元素量，不可补充也不随时间衰减",
+    "option_d": "可以无限补充",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 103,
+    "question": "双计数器中的计时器规则是什么？",
+    "option_a": "每2.5秒强制计次器归零",
+    "option_b": "每3秒强制计次器归零",
+    "option_c": "每4秒强制计次器归零",
+    "option_d": "每5秒强制计次器归零",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 104,
+    "question": "风元素的扩散反应有什么特殊之处？",
+    "option_a": "只对被扩散单位造成伤害，对其它单位只提供元素附着",
+    "option_b": "对所有单位造成相同伤害",
+    "option_c": "只提供元素附着不造成伤害",
+    "option_d": "不造成任何伤害",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 105,
+    "question": "激化元素的衰减速率有什么特点？",
+    "option_a": "恒定不变",
+    "option_b": "随时间变化",
+    "option_c": "随元素量变化",
+    "option_d": "恒定为固定值",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 106,
+    "question": "冻结元素的衰减速率有什么特点？",
+    "option_a": "随元素量变化而不随时间变化",
+    "option_b": "随时间变化而不随元素量变化",
+    "option_c": "既随时间又随元素量变化",
+    "option_d": "既不随时间也不随元素量变化",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 107,
+    "question": "超导反应会降低目标的物理抗性持续时间是多少？",
+    "option_a": "8秒",
+    "option_b": "10秒",
+    "option_c": "12秒",
+    "option_d": "15秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 108,
+    "question": "感电反应每秒结算几次？",
+    "option_a": "1次",
+    "option_b": "2次",
+    "option_c": "3次",
+    "option_d": "4次",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 109,
+    "question": "燃烧反应每隔多长时间结算一次伤害？",
+    "option_a": "0.1秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 110,
+    "question": "结晶反应对于一个独立单位，每秒最多触发几次？",
+    "option_a": "1次",
+    "option_b": "2次",
+    "option_c": "3次",
+    "option_d": "4次",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 111,
+    "question": "冻结抵抗为80%的敌人，冻结元素附着时会损耗多少百分比？",
+    "option_a": "20%",
+    "option_b": "50%",
+    "option_c": "70%",
+    "option_d": "80%",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 112,
+    "question": "冻结元素的基础衰减速率是多少？",
+    "option_a": "300mU·s⁻¹",
+    "option_b": "400mU·s⁻¹",
+    "option_c": "500mU·s⁻¹",
+    "option_d": "600mU·s⁻¹",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 113,
+    "question": "冻结元素的最长持续时间公式是什么？",
+    "option_a": "t(n)=3n+6",
+    "option_b": "t(n)=4n+6",
+    "option_c": "t(n)=5n+6",
+    "option_d": "t(n)=6n+6",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 114,
+    "question": "激化元素的衰减速率公式是什么？",
+    "option_a": "v(n)=n/(3n+6)",
+    "option_b": "v(n)=n/(4n+6)",
+    "option_c": "v(n)=n/(5n+6)",
+    "option_d": "v(n)=n/(6n+6)",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 115,
+    "question": "燃烧元素附着后，每隔多长时间结算一次伤害？",
+    "option_a": "0.1秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 116,
+    "question": "燃烧元素附着后，每隔多长时间附着一次弱火元素？",
+    "option_a": "0.1秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 117,
+    "question": "雷暴云自生成后多长时间开始第一次攻击？",
+    "option_a": "0秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 118,
+    "question": "雷暴云同一单位多长时间内最多被攻击1次？",
+    "option_a": "1秒",
+    "option_b": "2秒",
+    "option_c": "3秒",
+    "option_d": "4秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 119,
+    "question": "月感电反应中，每次攻击扣除目标多少U的水雷元素？",
+    "option_a": "0.2U",
+    "option_b": "0.4U",
+    "option_c": "0.6U",
+    "option_d": "0.8U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 120,
+    "question": "冻结元素消耗速率的最小值是多少？",
+    "option_a": "200mU·s⁻¹",
+    "option_b": "300mU·s⁻¹",
+    "option_c": "400mU·s⁻¹",
+    "option_d": "500mU·s⁻¹",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 121,
+    "question": "冻结元素消耗速率的加速度是多少？",
+    "option_a": "0.05",
+    "option_b": "0.1",
+    "option_c": "0.15",
+    "option_d": "0.2",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 122,
+    "question": "元素量单位制词头中，1U等于多少mU？",
+    "option_a": "1000mU",
+    "option_b": "100mU",
+    "option_c": "10mU",
+    "option_d": "10000mU",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 123,
+    "question": "元素克制关系的传递性如何？",
+    "option_a": "有传递性",
+    "option_b": "无传递性",
+    "option_c": "部分有传递性",
+    "option_d": "视情况而定",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 124,
+    "question": "元素克制关系中，消耗元素量比例是多少？",
+    "option_a": "1:1",
+    "option_b": "1:2",
+    "option_c": "2:1",
+    "option_d": "1:3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 125,
+    "question": "增幅反应区的基本公式是什么？",
+    "option_a": "增幅反应系数 × (1 + 精通加成)",
+    "option_b": "增幅反应系数 × (1 + 精通加成) × 增幅反应加成",
+    "option_c": "增幅反应系数 × 精通加成",
+    "option_d": "增幅反应系数 × 增幅反应加成",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 126,
+    "question": "剧变反应伤害的基本公式是什么？",
+    "option_a": "反应等级系数 × 剧变反应系数 × 精通加成区 × 抗性区",
+    "option_b": "反应等级系数 × 剧变反应系数 × 精通加成区",
+    "option_c": "反应等级系数 × 剧变反应系数 × 抗性区",
+    "option_d": "剧变反应系数 × 精通加成区 × 抗性区",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 127,
+    "question": "激化反应区的基本公式是什么？",
+    "option_a": "反应等级系数 × 激化反应系数 × 精通加成区",
+    "option_b": "反应等级系数 × 激化反应系数 × 元素精通百分比加成",
+    "option_c": "反应等级系数 × 激化反应加成",
+    "option_d": "反应等级系数 × 激化反应系数 × 激化反应加成",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 128,
+    "question": "月曜反应系数的基本公式是什么？",
+    "option_a": "反应等级系数 × 月曜反应系数 × (1 + 基础伤害增益)",
+    "option_b": "反应等级系数 × 月曜反应系数 × 基础伤害增益",
+    "option_c": "月曜反应系数 × (1 + 基础伤害增益)",
+    "option_d": "反应等级系数 × (1 + 基础伤害增益)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 129,
+    "question": "元素精通加成区的基本公式是什么？",
+    "option_a": "1 + 16×元素精通/(元素精通+2000) + 反应加成",
+    "option_b": "1 + 16×元素精通/(元素精通+1400) + 反应加成",
+    "option_c": "1 + 16×元素精通/(元素精通+2000)",
+    "option_d": "16×元素精通/(元素精通+2000)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 130,
+    "question": "结晶护盾值的基本公式是什么？",
+    "option_a": "结晶等级系数 × (1 + 4.44×元素精通/(元素精通+1400))",
+    "option_b": "结晶等级系数 × 4.44×元素精通/(元素精通+1400)",
+    "option_c": "结晶等级系数 × (1 + 4.44×元素精通/(元素精通+1400)) × 元素精通百分比",
+    "option_d": "结晶等级系数 × 元素精通百分比",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 131,
+    "question": "弱元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 132,
+    "question": "中元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 133,
+    "question": "强元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 134,
+    "question": "超强元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 135,
+    "question": "弱元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 136,
+    "question": "中元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 137,
+    "question": "强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 138,
+    "question": "超强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 139,
+    "question": "元素量衰减速率的基本公式是什么？",
+    "option_a": "v(n)=8n/(25n+70)",
+    "option_b": "v(n)=8n/(25n+60)",
+    "option_c": "v(n)=8n/(30n+70)",
+    "option_d": "v(n)=8n/(25n+80)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 140,
+    "question": "80级角色的反应等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 141,
+    "question": "90级角色的反应等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 142,
+    "question": "80级角色的结晶等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 143,
+    "question": "90级角色的结晶等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 144,
+    "question": "元素精通稀释现象的数学本质是什么？",
+    "option_a": "元素精通收益呈线性增长",
+    "option_b": "元素精通越高，继续增加的相对收益越低",
+    "option_c": "元素精通收益呈指数增长",
+    "option_d": "元素精通收益是固定值",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 145,
+    "question": "元素精通稀释函数f(x)的极限值是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "2.78",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 146,
+    "question": "元素精通稀释函数f(x)的导数极限值是多少？",
+    "option_a": "0",
+    "option_b": "0.5",
+    "option_c": "1",
+    "option_d": "2",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 147,
+    "question": "元素精通稀释函数f(x)的极值点在哪里？",
+    "option_a": "x=1000",
+    "option_b": "x=1400",
+    "option_c": "x=2000",
+    "option_d": "x=3000",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 148,
+    "question": "在提瓦特大陆上，弱元素含有多少元素量？",
+    "option_a": "0.5U",
+    "option_b": "1U",
+    "option_c": "1.5U",
+    "option_d": "2U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 149,
+    "question": "强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 150,
+    "question": "在增幅反应中，水元素攻击引发蒸发反应时的增幅反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 151,
+    "question": "火元素攻击引发融化反应时的增幅反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 152,
+    "question": "超载反应的剧变反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.75",
+    "option_d": "3",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 153,
+    "question": "超导反应会降低目标的什么抗性？",
+    "option_a": "元素抗性",
+    "option_b": "物理抗性",
+    "option_c": "雷元素抗性",
+    "option_d": "冰元素抗性",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 154,
+    "question": "感电反应每隔多长时间结算一次伤害？",
+    "option_a": "0.5秒",
+    "option_b": "1秒",
+    "option_c": "1.5秒",
+    "option_d": "2秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 155,
+    "question": "燃烧反应的剧变反应系数是多少（单次结算）？",
+    "option_a": "0.25",
+    "option_b": "0.5",
+    "option_c": "1",
+    "option_d": "2",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 156,
+    "question": "冻结元素的基础衰减速率是多少？",
+    "option_a": "200mU·s⁻¹",
+    "option_b": "300mU·s⁻¹",
+    "option_c": "400mU·s⁻¹",
+    "option_d": "500mU·s⁻¹",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 157,
+    "question": "当冻结元素低于多少时，碎冰反应无法结算伤害？",
+    "option_a": "0.3U",
+    "option_b": "0.5U",
+    "option_c": "0.8U",
+    "option_d": "1U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 158,
+    "question": "碎冰反应的剧变反应系数是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "3",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 159,
+    "question": "扩散反应的剧变反应系数是多少？",
+    "option_a": "0.4",
+    "option_b": "0.6",
+    "option_c": "0.8",
+    "option_d": "1",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 160,
+    "question": "绽放反应的剧变反应系数是多少？",
+    "option_a": "1",
+    "option_b": "1.5",
+    "option_c": "2",
+    "option_d": "3",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 161,
+    "question": "超绽放反应和烈绽放反应的剧变反应系数是多少？",
+    "option_a": "2",
+    "option_b": "2.5",
+    "option_c": "3",
+    "option_d": "3.5",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 162,
+    "question": "当场地上已经存在多少枚草原核后，继续生成草原核时会引爆最早生成的一枚？",
+    "option_a": "3枚",
+    "option_b": "4枚",
+    "option_c": "5枚",
+    "option_d": "6枚",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 163,
+    "question": "结晶反应对于一个独立单位，每隔多长时间最多触发1次？",
+    "option_a": "0.5秒",
+    "option_b": "1秒",
+    "option_c": "1.5秒",
+    "option_d": "2秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 164,
+    "question": "超激化反应的激化反应系数是多少？",
+    "option_a": "0.8",
+    "option_b": "1",
+    "option_c": "1.15",
+    "option_d": "1.25",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 165,
+    "question": "蔓激化反应的激化反应系数是多少？",
+    "option_a": "1",
+    "option_b": "1.15",
+    "option_c": "1.25",
+    "option_d": "1.5",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 166,
+    "question": "对于nU激化元素，其最长附着时间的计算公式是什么？",
+    "option_a": "t(n)=3n+6",
+    "option_b": "t(n)=4n+6",
+    "option_c": "t(n)=5n+6",
+    "option_d": "t(n)=6n+6",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 167,
+    "question": "在元素克制关系中，哪个元素克制水元素？",
+    "option_a": "火元素",
+    "option_b": "冰元素",
+    "option_c": "草元素",
+    "option_d": "雷元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 168,
+    "question": "什么是\"触发元素不残留原则\"？",
+    "option_a": "触发元素在反应后会残留一半",
+    "option_b": "触发元素即使过量也不会残留",
+    "option_c": "触发元素总是会残留",
+    "option_d": "触发元素只在增幅反应中不残留",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 169,
+    "question": "燃烧反应触发时会发生什么？",
+    "option_a": "立即造成伤害并扣除元素量",
+    "option_b": "产生燃烧元素但不扣除元素量",
+    "option_c": "扣除草元素但不扣除火元素",
+    "option_d": "同时扣除火元素和草元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 170,
+    "question": "关于激化元素的特性，以下哪项是正确的？",
+    "option_a": "激化元素不能与其他元素共存",
+    "option_b": "激化元素可以与雷元素、草元素共存",
+    "option_c": "激化元素只能与火元素共存",
+    "option_d": "激化元素会立即消失",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 171,
+    "question": "为什么元素精通存在\"稀释\"现象？",
+    "option_a": "元素精通收益是固定值",
+    "option_b": "元素精通越高，继续增加的相对收益越低",
+    "option_c": "元素精通没有任何收益上限",
+    "option_d": "元素精通收益呈线性增长",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 172,
+    "question": "在感电反应中，雷元素和水元素的关系是什么？",
+    "option_a": "只有雷元素是附着元素",
+    "option_b": "只有水元素是附着元素",
+    "option_c": "两种元素均被视为附着元素",
+    "option_d": "两种元素会立即消失",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 173,
+    "question": "扩散反应的主要作用是什么？",
+    "option_a": "只造成伤害",
+    "option_b": "补充元素量并扩散到更大范围",
+    "option_c": "降低敌人防御力",
+    "option_d": "提高角色攻击力",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 174,
+    "question": "增幅反应与原有伤害的关系是什么？",
+    "option_a": "加算关系",
+    "option_b": "乘算关系",
+    "option_c": "减算关系",
+    "option_d": "无关系",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 175,
+    "question": "冻结反应对敌人的主要效果是什么？",
+    "option_a": "造成大量伤害",
+    "option_b": "降低敌人抗性",
+    "option_c": "强制暂停敌人行动",
+    "option_d": "提高队伍攻击力",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 176,
+    "question": "草原核被火元素攻击会触发什么反应？",
+    "option_a": "超绽放反应",
+    "option_b": "烈绽放反应",
+    "option_c": "燃烧反应",
+    "option_d": "融化反应",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 177,
+    "question": "草原核被雷元素攻击会触发什么反应？",
+    "option_a": "超绽放反应",
+    "option_b": "烈绽放反应",
+    "option_c": "超载反应",
+    "option_d": "感电反应",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 178,
+    "question": "超激化反应和蔓激化反应会消耗元素吗？",
+    "option_a": "会消耗所有元素",
+    "option_b": "只消耗激化元素",
+    "option_c": "不消耗任何元素",
+    "option_d": "只消耗一半元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 179,
+    "question": "剧变反应的伤害与以下哪项因素无关？",
+    "option_a": "角色等级",
+    "option_b": "元素精通",
+    "option_c": "攻击力",
+    "option_d": "敌方抗性",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 180,
+    "question": "当雷元素和水元素共同附着时，哪种元素的反应优先级更高？",
+    "option_a": "水元素",
+    "option_b": "雷元素",
+    "option_c": "两者相同",
+    "option_d": "取决于元素量",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 181,
+    "question": "燃烧元素附着的特点是什么？",
+    "option_a": "可以被补充和刷新",
+    "option_b": "含固定元素量，不可补充也不随时间衰减",
+    "option_c": "会随时间快速衰减",
+    "option_d": "可以与所有元素共存",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 182,
+    "question": "双计数器中的计次器是什么规则？",
+    "option_a": "每2次攻击中1次能附着元素",
+    "option_b": "每3次攻击中1次能附着元素",
+    "option_c": "每4次攻击中1次能附着元素",
+    "option_d": "每5次攻击中1次能附着元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 183,
+    "question": "元素量叠加时，如果向已附着基本元素的目标再次附着该元素会发生什么？",
+    "option_a": "元素量相加",
+    "option_b": "元素量取较大值，衰减速率继承",
+    "option_c": "元素量取较小值",
+    "option_d": "元素量归零",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 184,
+    "question": "旅行者·风的元素转化判定顺序是什么？",
+    "option_a": "火、水、雷、冰",
+    "option_b": "冰、火、水、雷",
+    "option_c": "水、火、冰、雷",
+    "option_d": "雷、冰、火、水",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 185,
+    "question": "以下关于碎冰反应的说法，哪项是正确的？",
+    "option_a": "碎冰反应造成元素伤害",
+    "option_b": "碎冰反应造成物理伤害",
+    "option_c": "碎冰反应不造成任何伤害",
+    "option_d": "碎冰反应造成冰元素伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 186,
+    "question": "在绽放反应中，草原核爆炸会对谁造成伤害？",
+    "option_a": "只对敌人造成伤害",
+    "option_b": "同时对触发者造成伤害",
+    "option_c": "只对触发者造成伤害",
+    "option_d": "不造成任何伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 187,
+    "question": "月感电反应中，雷暴云的存在时间是多少秒？",
+    "option_a": "4秒",
+    "option_b": "5秒",
+    "option_c": "6秒",
+    "option_d": "7秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 188,
+    "question": "状态元素是什么？",
+    "option_a": "基本元素的一种",
+    "option_b": "持续反应的根本表征",
+    "option_c": "临时的元素附着",
+    "option_d": "不存在的概念",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 189,
+    "question": "什么情况下会触发结晶反应？",
+    "option_a": "风元素与任意元素接触",
+    "option_b": "岩元素与火、水、雷、冰元素接触",
+    "option_c": "草元素与水元素接触",
+    "option_d": "雷元素与火元素接触",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 190,
+    "question": "冻结元素的衰减速率有什么特点？",
+    "option_a": "恒定不变",
+    "option_b": "随时间变化而不随元素量变化",
+    "option_c": "随元素量变化而不随时间变化",
+    "option_d": "既不随时间也不随元素量变化",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 191,
+    "question": "水元素的扩散反应有什么特殊之处？",
+    "option_a": "不造成任何伤害",
+    "option_b": "只对被扩散单位造成伤害，对其它单位只提供元素附着",
+    "option_c": "对所有单位造成相同伤害",
+    "option_d": "只提供元素附着不造成伤害",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 192,
+    "question": "原激化反应会造成伤害提升吗？",
+    "option_a": "会造成大量伤害提升",
+    "option_b": "会造成少量伤害提升",
+    "option_c": "不造成伤害提升",
+    "option_d": "会降低伤害",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 193,
+    "question": "在元素克制关系中，单次反应消耗元素量比例是多少？",
+    "option_a": "1:1",
+    "option_b": "1:2",
+    "option_c": "2:1",
+    "option_d": "1:3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 194,
+    "question": "激化反应将在哪个伤害乘区追加效果？",
+    "option_a": "增伤区",
+    "option_b": "暴击区",
+    "option_c": "基础伤害区",
+    "option_d": "抗性区",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 195,
+    "question": "提瓦特大陆上有多少种基本元素？",
+    "option_a": "5种",
+    "option_b": "6种",
+    "option_c": "7种",
+    "option_d": "8种",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 196,
+    "question": "以下哪种元素不能附着在实体单位上？",
+    "option_a": "火元素",
+    "option_b": "风元素",
+    "option_c": "水元素",
+    "option_d": "雷元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 197,
+    "question": "中元素含有的元素量是多少？",
+    "option_a": "0.5U",
+    "option_b": "1U",
+    "option_c": "1.5U",
+    "option_d": "2U",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 198,
+    "question": "超强元素含有的元素量是多少？",
+    "option_a": "2U",
+    "option_b": "3U",
+    "option_c": "4U",
+    "option_d": "5U",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 199,
+    "question": "元素量叠加时，如果向已附着基本元素的目标再次附着相同元素，会发生什么？",
+    "option_a": "元素量相加",
+    "option_b": "元素量取较大值，衰减速率继承",
+    "option_c": "元素量取较小值",
+    "option_d": "元素量归零",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 200,
+    "question": "燃烧元素的衰减特点是什么？",
+    "option_a": "随时间快速衰减",
+    "option_b": "随元素量变化",
+    "option_c": "含固定元素量，不可补充也不随时间衰减",
+    "option_d": "可以无限补充",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 201,
+    "question": "双计数器中的计时器规则是什么？",
+    "option_a": "每2.5秒强制计次器归零",
+    "option_b": "每3秒强制计次器归零",
+    "option_c": "每4秒强制计次器归零",
+    "option_d": "每5秒强制计次器归零",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 202,
+    "question": "风元素的扩散反应有什么特殊之处？",
+    "option_a": "只对被扩散单位造成伤害，对其它单位只提供元素附着",
+    "option_b": "对所有单位造成相同伤害",
+    "option_c": "只提供元素附着不造成伤害",
+    "option_d": "不造成任何伤害",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 203,
+    "question": "激化元素的衰减速率有什么特点？",
+    "option_a": "恒定不变",
+    "option_b": "随时间变化",
+    "option_c": "随元素量变化",
+    "option_d": "恒定为固定值",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 204,
+    "question": "冻结元素的衰减速率有什么特点？",
+    "option_a": "随元素量变化而不随时间变化",
+    "option_b": "随时间变化而不随元素量变化",
+    "option_c": "既随时间又随元素量变化",
+    "option_d": "既不随时间也不随元素量变化",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 205,
+    "question": "超导反应会降低目标的物理抗性持续时间是多少？",
+    "option_a": "8秒",
+    "option_b": "10秒",
+    "option_c": "12秒",
+    "option_d": "15秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 206,
+    "question": "感电反应每秒结算几次？",
+    "option_a": "1次",
+    "option_b": "2次",
+    "option_c": "3次",
+    "option_d": "4次",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 207,
+    "question": "燃烧反应每隔多长时间结算一次伤害？",
+    "option_a": "0.1秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 208,
+    "question": "结晶反应对于一个独立单位，每秒最多触发几次？",
+    "option_a": "1次",
+    "option_b": "2次",
+    "option_c": "3次",
+    "option_d": "4次",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 209,
+    "question": "冻结抵抗为80%的敌人，冻结元素附着时会损耗多少百分比？",
+    "option_a": "20%",
+    "option_b": "50%",
+    "option_c": "70%",
+    "option_d": "80%",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 210,
+    "question": "冻结元素的基础衰减速率是多少？",
+    "option_a": "300mU·s⁻¹",
+    "option_b": "400mU·s⁻¹",
+    "option_c": "500mU·s⁻¹",
+    "option_d": "600mU·s⁻¹",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 211,
+    "question": "冻结元素的最长持续时间公式是什么？",
+    "option_a": "t(n)=3n+6",
+    "option_b": "t(n)=4n+6",
+    "option_c": "t(n)=5n+6",
+    "option_d": "t(n)=6n+6",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 212,
+    "question": "激化元素的衰减速率公式是什么？",
+    "option_a": "v(n)=n/(3n+6)",
+    "option_b": "v(n)=n/(4n+6)",
+    "option_c": "v(n)=n/(5n+6)",
+    "option_d": "v(n)=n/(6n+6)",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 213,
+    "question": "燃烧元素附着后，每隔多长时间结算一次伤害？",
+    "option_a": "0.1秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 214,
+    "question": "燃烧元素附着后，每隔多长时间附着一次弱火元素？",
+    "option_a": "0.1秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 215,
+    "question": "雷暴云自生成后多长时间开始第一次攻击？",
+    "option_a": "0秒",
+    "option_b": "0.25秒",
+    "option_c": "0.5秒",
+    "option_d": "1秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 216,
+    "question": "雷暴云同一单位多长时间内最多被攻击1次？",
+    "option_a": "1秒",
+    "option_b": "2秒",
+    "option_c": "3秒",
+    "option_d": "4秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 217,
+    "question": "月感电反应中，每次攻击扣除目标多少U的水雷元素？",
+    "option_a": "0.2U",
+    "option_b": "0.4U",
+    "option_c": "0.6U",
+    "option_d": "0.8U",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 218,
+    "question": "冻结元素消耗速率的最小值是多少？",
+    "option_a": "200mU·s⁻¹",
+    "option_b": "300mU·s⁻¹",
+    "option_c": "400mU·s⁻¹",
+    "option_d": "500mU·s⁻¹",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 219,
+    "question": "冻结元素消耗速率的加速度是多少？",
+    "option_a": "0.05",
+    "option_b": "0.1",
+    "option_c": "0.15",
+    "option_d": "0.2",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 220,
+    "question": "元素量单位制词头中，1U等于多少mU？",
+    "option_a": "1000mU",
+    "option_b": "100mU",
+    "option_c": "10mU",
+    "option_d": "10000mU",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 221,
+    "question": "元素克制关系的传递性如何？",
+    "option_a": "有传递性",
+    "option_b": "无传递性",
+    "option_c": "部分有传递性",
+    "option_d": "视情况而定",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 222,
+    "question": "元素克制关系中，消耗元素量比例是多少？",
+    "option_a": "1:1",
+    "option_b": "1:2",
+    "option_c": "2:1",
+    "option_d": "1:3",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 223,
+    "question": "增幅反应区的基本公式是什么？",
+    "option_a": "增幅反应系数 × (1 + 精通加成)",
+    "option_b": "增幅反应系数 × (1 + 精通加成) × 增幅反应加成",
+    "option_c": "增幅反应系数 × 精通加成",
+    "option_d": "增幅反应系数 × 增幅反应加成",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 224,
+    "question": "剧变反应伤害的基本公式是什么？",
+    "option_a": "反应等级系数 × 剧变反应系数 × 精通加成区 × 抗性区",
+    "option_b": "反应等级系数 × 剧变反应系数 × 精通加成区",
+    "option_c": "反应等级系数 × 剧变反应系数 × 抗性区",
+    "option_d": "剧变反应系数 × 精通加成区 × 抗性区",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 225,
+    "question": "激化反应区的基本公式是什么？",
+    "option_a": "反应等级系数 × 激化反应系数 × 精通加成区",
+    "option_b": "反应等级系数 × 激化反应系数 × 元素精通百分比加成",
+    "option_c": "反应等级系数 × 激化反应加成",
+    "option_d": "反应等级系数 × 激化反应系数 × 激化反应加成",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 226,
+    "question": "月曜反应系数的基本公式是什么？",
+    "option_a": "反应等级系数 × 月曜反应系数 × (1 + 基础伤害增益)",
+    "option_b": "反应等级系数 × 月曜反应系数 × 基础伤害增益",
+    "option_c": "月曜反应系数 × (1 + 基础伤害增益)",
+    "option_d": "反应等级系数 × (1 + 基础伤害增益)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 227,
+    "question": "元素精通加成区的基本公式是什么？",
+    "option_a": "1 + 16×元素精通/(元素精通+2000) + 反应加成",
+    "option_b": "1 + 16×元素精通/(元素精通+1400) + 反应加成",
+    "option_c": "1 + 16×元素精通/(元素精通+2000)",
+    "option_d": "16×元素精通/(元素精通+2000)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 228,
+    "question": "结晶护盾值的基本公式是什么？",
+    "option_a": "结晶等级系数 × (1 + 4.44×元素精通/(元素精通+1400))",
+    "option_b": "结晶等级系数 × 4.44×元素精通/(元素精通+1400)",
+    "option_c": "结晶等级系数 × (1 + 4.44×元素精通/(元素精通+1400)) × 元素精通百分比",
+    "option_d": "结晶等级系数 × 元素精通百分比",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 229,
+    "question": "弱元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 230,
+    "question": "中元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 231,
+    "question": "强元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 232,
+    "question": "超强元素的衰减速率是多少？",
+    "option_a": "84.21mU·s⁻¹",
+    "option_b": "111.63mU·s⁻¹",
+    "option_c": "133.33mU·s⁻¹",
+    "option_d": "188.24mU·s⁻¹",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 233,
+    "question": "弱元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 234,
+    "question": "中元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 235,
+    "question": "强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 236,
+    "question": "超强元素的最长附着时间是多少秒？",
+    "option_a": "9.5秒",
+    "option_b": "10.75秒",
+    "option_c": "12秒",
+    "option_d": "17秒",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 237,
+    "question": "元素量衰减速率的基本公式是什么？",
+    "option_a": "v(n)=8n/(25n+70)",
+    "option_b": "v(n)=8n/(25n+60)",
+    "option_c": "v(n)=8n/(30n+70)",
+    "option_d": "v(n)=8n/(25n+80)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 238,
+    "question": "80级角色的反应等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 239,
+    "question": "90级角色的反应等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 240,
+    "question": "80级角色的结晶等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 241,
+    "question": "90级角色的结晶等级系数是多少？",
+    "option_a": "1077",
+    "option_b": "1447",
+    "option_c": "1597",
+    "option_d": "1851",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 242,
+    "question": "元素精通稀释现象的数学本质是什么？",
+    "option_a": "元素精通收益呈线性增长",
+    "option_b": "元素精通越高，继续增加的相对收益越低",
+    "option_c": "元素精通收益呈指数增长",
+    "option_d": "元素精通收益是固定值",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 243,
+    "question": "元素精通稀释函数f(x)的极限值是多少？",
+    "option_a": "1.5",
+    "option_b": "2",
+    "option_c": "2.5",
+    "option_d": "2.78",
+    "correct_answer": "D",
+    "category": "高等元素论"
+  },
+  {
+    "id": 244,
+    "question": "元素精通稀释函数f(x)的导数极限值是多少？",
+    "option_a": "0",
+    "option_b": "0.5",
+    "option_c": "1",
+    "option_d": "2",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 245,
+    "question": "元素精通稀释函数f(x)的极值点在哪里？",
+    "option_a": "x=1000",
+    "option_b": "x=1400",
+    "option_c": "x=2000",
+    "option_d": "x=3000",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 246,
+    "question": "为什么说元素精通存在\"稀释\"现象？",
+    "option_a": "元素精通越高，继续增加的相对收益越低",
+    "option_b": "元素精通收益呈线性增长",
+    "option_c": "元素精通收益呈指数增长",
+    "option_d": "元素精通收益是固定值",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 247,
+    "question": "什么是\"双计数器\"机制？",
+    "option_a": "每个技能只能附着元素两次",
+    "option_b": "计次器和计时器共同限制元素附着",
+    "option_c": "每个角色有两个元素附着计数器",
+    "option_d": "计数器只在后台重置",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 248,
+    "question": "元素附着冷却的主要作用是什么？",
+    "option_a": "防止元素附着过于频繁",
+    "option_b": "平衡不同角色的元素附着能力",
+    "option_c": "限制技能的释放频率",
+    "option_d": "控制反应触发的频率",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 249,
+    "question": "为什么说\"元素克制关系无传递性\"？",
+    "option_a": "克制关系可以传递",
+    "option_b": "克制关系不能从一个元素传递到另一个元素",
+    "option_c": "克制关系只在特定情况下传递",
+    "option_d": "克制关系是双向的",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 250,
+    "question": "状态元素与基本元素的区别是什么？",
+    "option_a": "状态元素不能附着在敌人身上",
+    "option_b": "状态元素是持续反应的根本表征",
+    "option_c": "状态元素不能造成伤害",
+    "option_d": "状态元素与基本元素完全相同",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 251,
+    "question": "为什么燃烧反应不扣除元素量？",
+    "option_a": "因为燃烧反应不需要元素量",
+    "option_b": "因为燃烧元素量是固定的",
+    "option_c": "因为燃烧反应是瞬间反应",
+    "option_d": "因为燃烧反应不需要触发元素",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 252,
+    "question": "激化元素可以与哪些元素共存？",
+    "option_a": "只与雷元素共存",
+    "option_b": "只与草元素共存",
+    "option_c": "与雷元素和草元素共存",
+    "option_d": "与所有元素共存",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 253,
+    "question": "冻结元素为什么会阻碍进一步反应？",
+    "option_a": "因为冻结元素会吸收所有元素",
+    "option_b": "因为冻结元素有最高优先级",
+    "option_c": "因为冻结元素会冻结所有元素反应",
+    "option_d": "因为冻结元素会降低元素衰减速率",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 254,
+    "question": "扩散反应中，水元素的特殊之处是什么？",
+    "option_a": "水元素扩散不造成伤害",
+    "option_b": "水元素扩散只对被扩散单位造成伤害",
+    "option_c": "水元素扩散会降低冷却时间",
+    "option_d": "水元素扩散会提高元素量",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 255,
+    "question": "元素反应优先级总表的作用是什么？",
+    "option_a": "决定反应触发的顺序",
+    "option_b": "决定反应伤害的大小",
+    "option_c": "决定反应系数的数值",
+    "option_d": "决定反应持续的时间",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 256,
+    "question": "为什么说\"草元素克制水元素\"是不严谨的？",
+    "option_a": "因为草元素不克制水元素",
+    "option_b": "因为克制关系只适用于护盾，不适用于反应",
+    "option_c": "因为水元素克制草元素",
+    "option_d": "因为元素克制是双向的",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 257,
+    "question": "瞬间反应和持续反应的主要区别是什么？",
+    "option_a": "瞬间反应需要元素量，持续反应不需要",
+    "option_b": "瞬间反应立即结算伤害，持续反应产生状态元素",
+    "option_c": "瞬间反应只持续1秒，持续反应持续更久",
+    "option_d": "瞬间反应是基本反应，持续反应是状态反应",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 258,
+    "question": "元素附着的\"自燃衰减\"指的是什么？",
+    "option_a": "元素会自动消失",
+    "option_b": "元素衰减速率随时间变化",
+    "option_c": "元素量会自动减少",
+    "option_d": "元素附着时间会自动缩短",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 259,
+    "question": "为什么说触发元素即使过量也不会残留？",
+    "option_a": "因为触发元素会被完全消耗",
+    "option_b": "因为触发元素会转化为其他元素",
+    "option_c": "因为触发元素只在反应中存在",
+    "option_d": "因为触发元素会被其他元素吸收",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 260,
+    "question": "元素量叠加时，为什么衰减速率会继承？",
+    "option_a": "因为新元素会延续旧元素的衰减特性",
+    "option_b": "因为元素量相加时衰减速率也会相加",
+    "option_c": "因为衰减速率是元素的基本属性",
+    "option_d": "因为衰减速率与元素量无关",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 261,
+    "question": "燃烧元素的特殊性质是什么？",
+    "option_a": "可以被无限次补充",
+    "option_b": "含固定元素量，不可补充也不随时间衰减",
+    "option_c": "会随时间快速衰减",
+    "option_d": "只在特定条件下产生",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 262,
+    "question": "激化元素的衰减速率为什么恒定？",
+    "option_a": "因为激化元素不衰减",
+    "option_b": "因为激化元素的衰减速率固定为v(n)=n/(5n+6)",
+    "option_c": "因为激化元素随时间衰减",
+    "option_d": "因为激化元素随元素量衰减",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 263,
+    "question": "冻结元素的消耗速率为什么会变化？",
+    "option_a": "因为冻结元素随时间变化",
+    "option_b": "因为冻结元素的消耗速率随时间变化",
+    "option_c": "因为冻结元素的消耗速率随元素量变化",
+    "option_d": "因为冻结元素有特殊的消耗机制",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 264,
+    "question": "为什么说扩散反应可以\"提高反应体系的抵抗力稳定性\"？",
+    "option_a": "因为扩散反应可以降低敌人抗性",
+    "option_b": "因为扩散反应可以补充元素量并扩散到更大范围",
+    "option_c": "因为扩散反应可以提高伤害",
+    "option_d": "因为扩散反应可以降低冷却时间",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 265,
+    "question": "元素转化优先级的意义是什么？",
+    "option_a": "决定元素转化的顺序",
+    "option_b": "决定元素转化的效率",
+    "option_c": "决定元素转化的伤害",
+    "option_d": "决定元素转化的持续时间",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 266,
+    "question": "草元素扩散反应的特殊之处是什么？",
+    "option_a": "草元素扩散不造成伤害",
+    "option_b": "草元素扩散只提供元素附着",
+    "option_c": "草元素扩散可以转化为其他元素",
+    "option_d": "草元素扩散会降低元素衰减速率",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 267,
+    "question": "为什么说\"水雷同时附着\"时扩散反应会\"导致反应紊乱\"？",
+    "option_a": "因为水雷同时附着会产生感电反应",
+    "option_b": "因为扩散反应会干扰水雷附着",
+    "option_c": "因为水雷同时附着会随机触发反应",
+    "option_d": "因为扩散反应会消耗水雷元素",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 268,
+    "question": "元素反应伤害结算冷却的作用是什么？",
+    "option_a": "防止反应伤害过于频繁",
+    "option_b": "平衡不同反应的伤害输出",
+    "option_c": "限制技能的释放频率",
+    "option_d": "控制反应触发的频率",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 269,
+    "question": "为什么燃烧反应被称为\"无差别攻击\"？",
+    "option_a": "因为燃烧反应会攻击所有单位",
+    "option_b": "因为燃烧反应会同时伤害角色和敌人",
+    "option_c": "因为燃烧反应不区分元素类型",
+    "option_d": "因为燃烧反应会点燃草地",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 270,
+    "question": "元素附着的\"覆盖\"机制是什么意思？",
+    "option_a": "新元素会取代旧元素",
+    "option_b": "新元素会与旧元素融合",
+    "option_c": "新元素会叠加在旧元素上",
+    "option_d": "新元素会清除旧元素",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 271,
+    "question": "为什么说元素反应是\"奥卡姆剃刀定律\"的体现？",
+    "option_a": "因为元素反应设计简单",
+    "option_b": "因为元素反应遵循最简原则",
+    "option_c": "因为元素反应理论简洁明了",
+    "option_d": "因为元素反应不需要复杂计算",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 272,
+    "question": "元素附着冷却的双计数器中，计次器是什么？",
+    "option_a": "每3次攻击中仅有1次能附着元素",
+    "option_b": "每4次攻击中仅有1次能附着元素",
+    "option_c": "每5次攻击中仅有1次能附着元素",
+    "option_d": "每2次攻击中仅有1次能附着元素",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 273,
+    "question": "元素附着冷却的双计数器中，计时器是什么？",
+    "option_a": "每2秒强制计次器归零",
+    "option_b": "每2.5秒强制计次器归零",
+    "option_c": "每3秒强制计次器归零",
+    "option_d": "每4秒强制计次器归零",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 274,
+    "question": "为什么说元素反应理论是\"建立在推测的基础上\"？",
+    "option_a": "因为游戏源码无法获取",
+    "option_b": "因为元素反应过于复杂",
+    "option_c": "因为元素反应理论不准确",
+    "option_d": "因为元素反应理论是错误的",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 275,
+    "question": "元素反应优先级表的编制依据是什么？",
+    "option_a": "反应触发的难易程度",
+    "option_b": "反应伤害的大小",
+    "option_c": "反应持续的时间",
+    "option_d": "反应系数的数值",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 276,
+    "question": "为什么说元素反应是游戏的核心系统？",
+    "option_a": "因为元素反应决定伤害输出",
+    "option_b": "因为元素反应影响游戏平衡",
+    "option_c": "因为元素反应是游戏的特色",
+    "option_d": "因为元素反应决定游戏寿命",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 277,
+    "question": "元素反应分类的标准是什么？",
+    "option_a": "反应触发的元素数量",
+    "option_b": "反应造成的伤害类型",
+    "option_c": "反应是否产生状态元素",
+    "option_d": "反应持续的时间长短",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 278,
+    "question": "为什么说\"元素反应通性\"是基础理论？",
+    "option_a": "因为所有反应都遵循这些规则",
+    "option_b": "因为这些规则适用于所有元素",
+    "option_c": "因为这些规则是最基本的",
+    "option_d": "因为这些规则是其他理论的基础",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 279,
+    "question": "元素附着的\"最长附着时间\"公式是什么？",
+    "option_a": "t(n)=5/2 n + 7",
+    "option_b": "t(n)=5 n + 7",
+    "option_c": "t(n)=5/2 n + 6",
+    "option_d": "t(n)=5 n + 6",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 280,
+    "question": "元素衰减速率的基本公式是什么？",
+    "option_a": "v(n)=8n/(25n+70)",
+    "option_b": "v(n)=8n/(25n+60)",
+    "option_c": "v(n)=8n/(30n+70)",
+    "option_d": "v(n)=8n/(25n+80)",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 281,
+    "question": "为什么说元素反应是\"化学反应\"的体现？",
+    "option_a": "因为元素反应像化学反应一样复杂",
+    "option_b": "因为元素反应遵循化学反应原理",
+    "option_c": "因为元素反应产生新物质",
+    "option_d": "因为元素反应需要催化剂",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 282,
+    "question": "元素附着冷却的目的是什么？",
+    "option_a": "防止元素附着过于频繁",
+    "option_b": "平衡不同角色的元素附着能力",
+    "option_c": "限制技能的释放频率",
+    "option_d": "控制反应触发的频率",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 283,
+    "question": "为什么说元素反应理论是\"高等元素论\"？",
+    "option_a": "因为元素反应理论很高级",
+    "option_b": "因为元素反应理论很复杂",
+    "option_c": "因为元素反应理论是游戏的核心理论",
+    "option_d": "因为元素反应理论需要高等数学知识",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 284,
+    "question": "元素反应优先级表中，冻结元素的优先级为什么最高？",
+    "option_a": "因为冻结元素是最强的元素",
+    "option_b": "因为冻结元素会阻碍其他反应",
+    "option_c": "因为冻结元素衰减最慢",
+    "option_d": "因为冻结元素伤害最高",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 285,
+    "question": "为什么说\"扩散反应可以触发翠绿之影4件套效果\"？",
+    "option_a": "因为扩散反应是风元素反应",
+    "option_b": "因为扩散反应会降低元素抗性",
+    "option_c": "因为扩散反应符合4件套触发条件",
+    "option_d": "因为扩散反应是范围伤害",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 286,
+    "question": "元素反应伤害结算冷却的机制是什么？",
+    "option_a": "不同反应有不同的冷却时间",
+    "option_b": "冷却时间限制反应伤害频率",
+    "option_c": "冷却时间与元素精通相关",
+    "option_d": "冷却时间与角色等级相关",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 287,
+    "question": "为什么说燃烧反应是\"加速消耗草元素量\"？",
+    "option_a": "因为燃烧反应会消耗草元素",
+    "option_b": "因为燃烧反应会加速草元素衰减",
+    "option_c": "因为燃烧反应会降低草元素附着时间",
+    "option_d": "因为燃烧反应会阻止草元素附着",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 288,
+    "question": "元素克制关系的本质是什么？",
+    "option_a": "元素量的差异",
+    "option_b": "反应系数的差异",
+    "option_c": "消耗比例的差异",
+    "option_d": "附着时间的差异",
+    "correct_answer": "C",
+    "category": "高等元素论"
+  },
+  {
+    "id": 289,
+    "question": "为什么说\"元素反应是游戏的特色系统\"？",
+    "option_a": "因为其他游戏也有元素反应",
+    "option_b": "因为元素反应是米哈游的创新",
+    "option_c": "因为元素反应是RPG游戏的标准配置",
+    "option_d": "因为元素反应是动作游戏的核心",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 290,
+    "question": "元素附着的\"自燃衰减\"机制是什么？",
+    "option_a": "元素会自动燃烧",
+    "option_b": "元素衰减速率随时间变化",
+    "option_c": "元素量会自动减少",
+    "option_d": "元素附着时间会自动缩短",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 291,
+    "question": "为什么说元素反应理论是\"建立在实验基础上\"？",
+    "option_a": "因为理论来源于游戏源码分析",
+    "option_b": "因为理论来源于玩家实验结论",
+    "option_c": "因为理论来源于官方文档",
+    "option_d": "因为理论来源于数学推导",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 292,
+    "question": "元素反应分类为什么采用\"元素精通增益方式\"？",
+    "option_a": "因为元素精通是最重要的属性",
+    "option_b": "因为不同反应对元素精通的增益方式不同",
+    "option_c": "因为元素精通决定反应伤害",
+    "option_d": "因为元素精通是反应触发的关键",
+    "correct_answer": "B",
+    "category": "高等元素论"
+  },
+  {
+    "id": 293,
+    "question": "为什么说\"瞬间反应\"需要至少2种元素的参与？",
+    "option_a": "因为单元素无法产生反应",
+    "option_b": "因为瞬间反应需要元素碰撞",
+    "option_c": "因为瞬间反应需要元素融合",
+    "option_d": "因为瞬间反应需要元素转化",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  },
+  {
+    "id": 294,
+    "question": "元素附着的\"最长附着时间\"为什么与元素量相关？",
+    "option_a": "因为元素量越大附着时间越长",
+    "option_b": "因为元素量决定衰减速率",
+    "option_c": "因为元素量影响附着强度",
+    "option_d": "因为元素量与附着时间呈线性关系",
+    "correct_answer": "A",
+    "category": "高等元素论"
+  }
+];
+
+// State management
+let questions = [];
+let currentQuestionIndex = 0;
+let userAnswers = {};
+let quizStarted = false;
+let questionLookup = {};
+
+// DOM Elements
+const settingsPanel = document.getElementById('settings-panel');
+const quizPanel = document.getElementById('quiz-panel');
+const resultsPanel = document.getElementById('results-panel');
+const startQuizBtn = document.getElementById('start-quiz-btn');
+const nextBtn = document.getElementById('next-btn');
+const restartBtn = document.getElementById('restart-btn');
+const questionCountInput = document.getElementById('question-count');
+const categoryFilter = document.getElementById('category-filter');
+
+// Event Listeners
+startQuizBtn.addEventListener('click', startQuiz);
+nextBtn.addEventListener('click', nextQuestion);
+restartBtn.addEventListener('click', resetQuiz);
+
+// Initialize the app
+function init() {
+    loadCategories();
+    
+    // Set max questions based on available data
+    questionCountInput.max = ALL_QUESTIONS.length;
+}
+
+// Load available categories
+function loadCategories() {
+    const categories = [...new Set(ALL_QUESTIONS.map(q => q.category).filter(c => c))];
+    
+    categories.sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+}
+
+// Shuffle array using Fisher-Yates algorithm
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Start the quiz
+function startQuiz() {
+    const count = parseInt(questionCountInput.value) || 10;
+    const category = categoryFilter.value;
+    
+    // Filter questions by category if selected
+    let availableQuestions = category 
+        ? ALL_QUESTIONS.filter(q => q.category === category)
+        : ALL_QUESTIONS;
+    
+    if (availableQuestions.length === 0) {
+        alert('No questions available for the selected criteria.');
+        return;
+    }
+    
+    // Randomly select and shuffle questions
+    const shuffled = shuffleArray(availableQuestions);
+    questions = shuffled.slice(0, Math.min(count, shuffled.length));
+    
+    // Shuffle options for each question
+    questions = questions.map(q => {
+        const original_options = {
+            'A': q.option_a,
+            'B': q.option_b,
+            'C': q.option_c,
+            'D': q.option_d
+        };
+        
+        // Create shuffled options
+        const option_letters = ['A', 'B', 'C', 'D'];
+        const option_values = option_letters.map(letter => original_options[letter]);
+        const shuffled_pairs = option_letters.map((letter, i) => [letter, option_values[i]]);
+        
+        // Shuffle the pairs
+        for (let i = shuffled_pairs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled_pairs[i], shuffled_pairs[j]] = [shuffled_pairs[j], shuffled_pairs[i]];
+        }
+        
+        const shuffled_options = {};
+        shuffled_pairs.forEach(([letter, value]) => {
+            shuffled_options[letter] = value;
+        });
+        
+        // Store question data for checking answers later
+        questionLookup[q.id] = {
+            correct_answer: q.correct_answer,
+            original_options: original_options
+        };
+        
+        return {
+            id: q.id,
+            question: q.question,
+            options: shuffled_options,
+            category: q.category
+        };
+    });
+    
+    userAnswers = {};
+    currentQuestionIndex = 0;
+    quizStarted = true;
+    
+    settingsPanel.classList.add('hidden');
+    quizPanel.classList.remove('hidden');
+    
+    displayQuestion();
+}
+
+// Display current question
+function displayQuestion() {
+    const question = questions[currentQuestionIndex];
+    const totalQuestions = questions.length;
+    
+    // Update progress
+    document.getElementById('question-counter').textContent = 
+        `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
+    
+    const progressPercent = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+    
+    // Update question content
+    document.getElementById('question-category').textContent = question.category || 'General';
+    document.getElementById('question-text').textContent = question.question;
+    
+    // Create options
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = '';
+    
+    Object.entries(question.options).forEach(([letter, text]) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option';
+        optionDiv.dataset.value = letter;
+        
+        // Check if this option was previously selected
+        if (userAnswers[question.id] === letter) {
+            optionDiv.classList.add('selected');
+        }
+        
+        optionDiv.innerHTML = `
+            <div class="option-letter">${letter}</div>
+            <div class="option-text">${text}</div>
+        `;
+        
+        optionDiv.addEventListener('click', () => selectOption(question.id, letter, optionDiv));
+        optionsContainer.appendChild(optionDiv);
+    });
+    
+    // Update next button
+    updateNextButton();
+    
+    // Render MathJax for formulas
+    if (typeof MathJax !== 'undefined') {
+        MathJax.typesetPromise([document.getElementById('quiz-content')]).catch((err) => {
+            console.warn('MathJax rendering error:', err);
+        });
+    }
+}
+
+// Handle option selection
+function selectOption(questionId, selectedValue, optionElement) {
+    // Remove previous selection
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    
+    // Add selection to clicked option
+    optionElement.classList.add('selected');
+    
+    // Store answer
+    userAnswers[questionId] = selectedValue;
+    
+    // Enable next button
+    updateNextButton();
+}
+
+// Update next button state
+function updateNextButton() {
+    const question = questions[currentQuestionIndex];
+    const hasAnswer = userAnswers[question.id] !== undefined;
+    
+    nextBtn.disabled = !hasAnswer;
+    
+    if (currentQuestionIndex === questions.length - 1) {
+        nextBtn.textContent = 'Submit Quiz';
+    } else {
+        nextBtn.textContent = 'Next Question';
+    }
+}
+
+// Move to next question or submit
+function nextQuestion() {
+    if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        displayQuestion();
+    } else {
+        submitQuiz();
+    }
+}
+
+// Submit quiz and show results
+function submitQuiz() {
+    const results = calculateResults();
+    displayResults(results);
+}
+
+// Calculate quiz results
+function calculateResults() {
+    let correct_count = 0;
+    const total_count = questions.length;
+    const results = [];
+    
+    questions.forEach(question => {
+        const user_answer = userAnswers[question.id];
+        const question_data = questionLookup[question.id];
+        const correct_answer = question_data.correct_answer;
+        const original_options = question_data.original_options;
+        
+        const is_correct = user_answer === correct_answer;
+        if (is_correct) {
+            correct_count++;
+        }
+        
+        results.push({
+            question_id: question.id,
+            question: question.question,
+            user_answer: user_answer,
+            correct_answer: correct_answer,
+            is_correct: is_correct,
+            options: original_options
+        });
+    });
+    
+    const score = (correct_count / total_count * 100);
+    
+    return {
+        score: Math.round(score * 100) / 100,
+        correct: correct_count,
+        total: total_count,
+        results: results
+    };
+}
+
+// Display results
+function displayResults(results) {
+    quizPanel.classList.add('hidden');
+    resultsPanel.classList.remove('hidden');
+    
+    // Display score
+    document.getElementById('score-percentage').textContent = `${results.score}%`;
+    document.getElementById('correct-count').textContent = results.correct;
+    document.getElementById('total-count').textContent = results.total;
+    
+    // Display detailed results
+    const detailedResultsContainer = document.getElementById('detailed-results');
+    detailedResultsContainer.innerHTML = '<h3 style="margin-bottom: 20px;">Detailed Results</h3>';
+    
+    results.results.forEach((result, index) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = `result-item ${result.is_correct ? 'correct' : 'incorrect'}`;
+        
+        const userAnswerText = result.options[result.user_answer] || 'Not answered';
+        const correctAnswerText = result.options[result.correct_answer];
+        
+        resultItem.innerHTML = `
+            <div class="result-question">${index + 1}. ${result.question}</div>
+            ${!result.is_correct ? 
+                `<div class="result-answer wrong-answer">Your answer: ${result.user_answer}. ${userAnswerText}</div>` : 
+                `<div class="result-answer">Your answer: ${result.user_answer}. ${userAnswerText}</div>`
+            }
+            <div class="result-answer correct-answer">Correct answer: ${result.correct_answer}. ${correctAnswerText}</div>
+        `;
+        
+        detailedResultsContainer.appendChild(resultItem);
+    });
+    
+    // Render MathJax for formulas in results
+    if (typeof MathJax !== 'undefined') {
+        MathJax.typesetPromise([detailedResultsContainer]).catch((err) => {
+            console.warn('MathJax rendering error:', err);
+        });
+    }
+}
+
+// Reset quiz
+function resetQuiz() {
+    questions = [];
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    questionLookup = {};
+    quizStarted = false;
+    
+    resultsPanel.classList.add('hidden');
+    settingsPanel.classList.remove('hidden');
+    
+    startQuizBtn.disabled = false;
+    startQuizBtn.textContent = 'Start Quiz';
+}
+
+// Initialize the app on page load
+init();
+    </script>
+</body>
 </html>
